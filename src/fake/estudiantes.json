@@ -1,0 +1,32 @@
+[
+  {
+    "nombre": "Ana María López",
+    "curso": "5to Primaria",
+    "edad": 10,
+    "sexo": "F"
+  },
+  {
+    "nombre": "Carlos Andrés Pérez",
+    "curso": "6to Primaria",
+    "edad": 11,
+    "sexo": "M"
+  },
+  {
+    "nombre": "Lucía Fernández",
+    "curso": "1ro Secundaria",
+    "edad": 12,
+    "sexo": "F"
+  },
+  {
+    "nombre": "Mateo Ramírez",
+    "curso": "2do Secundaria",
+    "edad": 13,
+    "sexo": "M"
+  },
+  {
+    "nombre": "Valentina Torres",
+    "curso": "3ro Secundaria",
+    "edad": 14,
+    "sexo": "F"
+  }
+]
