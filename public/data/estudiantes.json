@@ -1,0 +1,22 @@
+[
+  { "id": 1, "nombre": "Juan Pérez", "curso": "Primero A", "turno": "Secundaria Mañana" },
+  { "id": 2, "nombre": "María López", "curso": "Segundo B", "turno": "Secundaria Tarde" },
+  { "id": 3, "nombre": "Carlos Sánchez", "curso": "Tercero C", "turno": "Secundaria Mañana" },
+  { "id": 4, "nombre": "Ana Torres", "curso": "Primero B", "turno": "Secundaria Tarde" },
+  { "id": 5, "nombre": "Luis Gutiérrez", "curso": "Segundo A", "turno": "Secundaria Mañana" },
+  { "id": 6, "nombre": "Sofía Romero", "curso": "Tercero B", "turno": "Secundaria Tarde" },
+  { "id": 7, "nombre": "Pedro Vargas", "curso": "Primero C", "turno": "Secundaria Mañana" },
+  { "id": 8, "nombre": "Laura Fernández", "curso": "Segundo C", "turno": "Secundaria Tarde" },
+  { "id": 9, "nombre": "Diego Castro", "curso": "Tercero A", "turno": "Secundaria Mañana" },
+  { "id": 10, "nombre": "Camila Morales", "curso": "Primero A", "turno": "Secundaria Tarde" },
+  { "id": 11, "nombre": "Andrés Molina", "curso": "Primero B", "turno": "Secundaria Mañana" },
+  { "id": 12, "nombre": "Valeria Silva", "curso": "Segundo B", "turno": "Secundaria Tarde" },
+  { "id": 13, "nombre": "Fernando Ruiz", "curso": "Tercero C", "turno": "Secundaria Mañana" },
+  { "id": 14, "nombre": "Gabriela Herrera", "curso": "Primero C", "turno": "Secundaria Tarde" },
+  { "id": 15, "nombre": "Hugo Ortega", "curso": "Segundo A", "turno": "Secundaria Mañana" },
+  { "id": 16, "nombre": "Isabella Rojas", "curso": "Tercero B", "turno": "Secundaria Tarde" },
+  { "id": 17, "nombre": "Manuel Chávez", "curso": "Primero A", "turno": "Secundaria Mañana" },
+  { "id": 18, "nombre": "Natalia Méndez", "curso": "Segundo C", "turno": "Secundaria Tarde" },
+  { "id": 19, "nombre": "Oscar Flores", "curso": "Tercero A", "turno": "Secundaria Mañana" },
+  { "id": 20, "nombre": "Paula Aguilar", "curso": "Primero B", "turno": "Secundaria Tarde" }
+]
