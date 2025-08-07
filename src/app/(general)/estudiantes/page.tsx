@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Header from '../../components/Header'
 import NavTabs from '../../components/NavTabs'
+import { useRouter } from 'next/navigation'
 
 export default function EstudiantesPage() {
   const [busqueda, setBusqueda] = useState('')
@@ -29,6 +30,10 @@ export default function EstudiantesPage() {
 
   // Calcular total de páginas
   const totalPaginas = Math.ceil(estudiantesFiltrados.length / estudiantesPorPagina)
+
+
+  const router = useRouter()
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -66,8 +71,11 @@ export default function EstudiantesPage() {
               <p className="font-parrafo text-foreground mb-4">
                 <strong>Turno:</strong> {est.turno}
               </p>
-              <button className="w-full bg-primary text-white py-2 rounded-lg font-subtitulo
-                                 hover:bg-secondary transition-colors">
+              <button
+                onClick={() => router.push(`/clinico-historial/${est.id}`)}
+                className="w-full bg-primary text-white py-2 rounded-lg font-subtitulo
+                          hover:bg-secondary transition-colors"
+              >
                 Revisar
               </button>
             </div>
