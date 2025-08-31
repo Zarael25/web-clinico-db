@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import ThemeToggle from '../../components/ThemeToggle'
 import { loginUsuario } from '@/services/auth'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,8 +21,19 @@ export default function LoginPage() {
       const data = await loginUsuario(username, password)
       setMensaje(data.message)
       console.log('Token recibido:', data.token)
-      // Aquí puedes guardar el token en localStorage o cookies
+
+      // Guardar token y nombre de usuario
       localStorage.setItem('token', data.token)
+
+      // Guardar nombre completo (nombre + appaterno)
+      if (data.usuario?.nombre || data.usuario?.appaterno || data.usuario?.apmaterno) {
+        const nombreCompleto = `${data.usuario?.nombre || ''} ${data.usuario?.appaterno || ''} ${data.usuario?.apmaterno || ''}`.trim()
+        localStorage.setItem('usuario', nombreCompleto)
+      } else {
+        localStorage.removeItem('usuario') // evita mostrar carnet
+      }
+      // Redirigir a estudiantes
+      router.push('/estudiantes')
     } catch (err: any) {
       setError(err.message)
     }

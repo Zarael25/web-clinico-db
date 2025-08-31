@@ -2,30 +2,33 @@
 
 import { useRouter } from 'next/navigation'
 import ThemeToggle from './ThemeToggle'
+import { useEffect, useState } from 'react'
 
 export default function Header() {
-    const router = useRouter()
+  const router = useRouter()
+  const [nombreUsuario, setNombreUsuario] = useState<string>('')
 
-    const handleLogout = () => {
-      // Aquí luego limpiarás tokens o sesión, por ahora solo redirige
-      router.push('/auth/login')
-    }
+  useEffect(() => {
+    const nombre = localStorage.getItem('usuario')
+    if (nombre) setNombreUsuario(nombre)
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('usuario')
+    router.push('/auth/login')
+  }
 
   return (
     <header className="w-full flex justify-between items-center px-6 py-4 bg-background border-b border-border shadow-sm">
-      {/* Título a la izquierda */}
       <h1 className="text-4xl font-titulo font-extrabold text-primary tracking-wide">
         Don Bosco Clínico
       </h1>
 
-      {/* Controles a la derecha */}
       <div className="flex items-center gap-4">
-        
-        {/* Nombre del usuario (temporal) */}
         <span className="font-titulo text-2xl font-bold text-foreground">
-          Alvaro Perez
+          {nombreUsuario || 'Usuario'}
         </span>
-
 
         <ThemeToggle />
         <button
