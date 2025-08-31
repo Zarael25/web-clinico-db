@@ -31,12 +31,10 @@ export default function EstudiantesPage() {
   // Calcular total de páginas
   const totalPaginas = Math.ceil(estudiantesFiltrados.length / estudiantesPorPagina)
 
-
   const router = useRouter()
 
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <Header />
       <NavTabs />
       <main className="p-6">
@@ -50,8 +48,8 @@ export default function EstudiantesPage() {
               setBusqueda(e.target.value)
               setPaginaActual(1) // Reiniciar a la primera página al buscar
             }}
-            className="flex-1 p-3 border border-border rounded-lg bg-background 
-                       focus:outline-none focus:ring-2 focus:ring-primary font-parrafo"
+            className="flex-1 p-3 border border-[var(--border)] rounded-lg bg-[var(--background)] 
+                       focus:outline-none focus:ring-2 focus:ring-[var(--primary)] font-parrafo"
           />
         </div>
 
@@ -60,21 +58,21 @@ export default function EstudiantesPage() {
           {estudiantesPagina.map(est => (
             <div
               key={est.id}
-              className="bg-background border border-border rounded-xl shadow-md p-5"
+              className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-md p-5"
             >
-              <h3 className="text-xl font-titulo text-primary mb-2">
+              <h3 className="text-xl font-titulo text-[var(--primary)] mb-2">
                 {est.nombre}
               </h3>
-              <p className="font-parrafo text-foreground">
+              <p className="font-parrafo text-[var(--foreground)]">
                 <strong>Curso:</strong> {est.curso}
               </p>
-              <p className="font-parrafo text-foreground mb-4">
+              <p className="font-parrafo text-[var(--foreground)] mb-4">
                 <strong>Turno:</strong> {est.turno}
               </p>
               <button
                 onClick={() => router.push(`/clinico-historial/${est.id}`)}
-                className="w-full bg-primary text-white py-2 rounded-lg font-subtitulo
-                          hover:bg-secondary transition-colors"
+                className="w-full bg-[var(--primary)] text-white py-2 rounded-lg font-subtitulo
+                          hover:bg-[var(--secondary)] transition-colors"
               >
                 Revisar
               </button>
@@ -89,11 +87,12 @@ export default function EstudiantesPage() {
               <button
                 key={i + 1}
                 onClick={() => setPaginaActual(i + 1)}
-                className={`px-4 py-2 rounded-lg border 
-                           ${paginaActual === i + 1
-                             ? 'bg-primary text-white'
-                             : 'bg-background text-foreground hover:bg-secondary/20'}
-                           transition`}
+                className={`px-4 py-2 rounded-lg border border-[var(--border)] transition
+                          ${
+                            paginaActual === i + 1
+                              ? 'bg-[var(--primary)] text-white'
+                              : 'bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--secondary)]/20'
+                          }`}
               >
                 {i + 1}
               </button>

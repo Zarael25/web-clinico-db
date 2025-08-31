@@ -37,7 +37,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="px-4 py-2 rounded bg-primary text-white"
+      className="px-4 py-2 rounded bg-[var(--primary)] text-white hover:bg-[var(--secondary)] transition-colors"
     >
       {darkMode ? 'Modo Claro' : 'Modo Oscuro'}
     </button>

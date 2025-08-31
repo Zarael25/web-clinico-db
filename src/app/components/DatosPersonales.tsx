@@ -10,18 +10,22 @@ export default function DatosPersonales() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-titulo text-primary mb-4">Datos Personales</h2>
+      <h2 className="text-2xl font-titulo text-[var(--primary)] mb-4">
+        Datos Personales
+      </h2>
 
       {secciones.map((seccion) => (
         <div
           key={seccion.titulo}
-          className="bg-background border border-border rounded-xl shadow-sm p-5"
+          className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-sm p-5"
         >
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-subtitulo text-foreground">{seccion.titulo}</h3>
+            <h3 className="text-lg font-subtitulo text-[var(--foreground)]">
+              {seccion.titulo}
+            </h3>
             <button
-              className="bg-primary text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
-                         hover:bg-secondary transition-colors"
+              className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
+                         hover:bg-[var(--secondary)] transition-colors"
             >
               Añadir
             </button>

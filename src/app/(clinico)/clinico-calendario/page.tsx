@@ -14,7 +14,7 @@ type Atencion = {
 // Datos de prueba
 const atencionesData: Record<string, Atencion[]> = {
   '2025-04-25': [
-{ nombre: 'Alvaro Perez', paralelo: '4A', turno: 'PM', hora: '08:30' },
+    { nombre: 'Alvaro Perez', paralelo: '4A', turno: 'PM', hora: '08:30' },
     { nombre: 'Maria Lopez', paralelo: '3B', turno: 'SM', hora: '09:15' },
     { nombre: 'Carlos Sanchez', paralelo: '5C', turno: 'PT', hora: '07:45' },
     { nombre: 'Laura Fernandez', paralelo: '2A', turno: 'SM', hora: '10:00' },
@@ -66,12 +66,12 @@ export default function ClinicoCalendarioPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <Header />
       <NavTabs />
       <main className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* ===== LADO IZQUIERDO ===== */}
-        <div className="bg-background border border-border rounded-xl shadow p-4">
+        <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-titulo">Atenciones</h2>
             <span className="font-subtitulo">{fechaSeleccionada}</span>
@@ -81,12 +81,12 @@ export default function ClinicoCalendarioPage() {
               {atencionesHoy.map((a, i) => (
                 <li
                   key={i}
-                  className="flex justify-between items-center border-b border-border py-2"
+                  className="flex justify-between items-center border-b border-[var(--border)] py-2"
                 >
                   <span className="font-parrafo">
                     {a.nombre} {a.paralelo} {a.turno}
                   </span>
-                  <span className="text-sm text-foreground">{a.hora}</span>
+                  <span className="text-sm text-[var(--foreground)]">{a.hora}</span>
                 </li>
               ))}
             </ul>
@@ -98,13 +98,13 @@ export default function ClinicoCalendarioPage() {
         </div>
 
         {/* ===== LADO DERECHO (CALENDARIO) ===== */}
-        <div className="bg-background border border-border rounded-xl shadow p-4">
+        <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow p-4">
           {/* Selección de mes y año */}
           <div className="flex justify-center gap-4 mb-4">
             <select
               value={mes}
               onChange={(e) => setMes(Number(e.target.value))}
-              className="p-2 border border-border rounded font-subtitulo"
+              className="p-2 border border-[var(--border)] rounded font-subtitulo"
             >
               {meses.map((m, i) => (
                 <option key={i} value={i}>{m}</option>
@@ -115,7 +115,7 @@ export default function ClinicoCalendarioPage() {
               type="number"
               value={anio}
               onChange={(e) => setAnio(Number(e.target.value))}
-              className="w-24 p-2 border border-border rounded font-subtitulo"
+              className="w-24 p-2 border border-[var(--border)] rounded font-subtitulo"
             />
           </div>
 
@@ -131,14 +131,13 @@ export default function ClinicoCalendarioPage() {
                 <button
                   key={i}
                   onClick={() => seleccionarDia(dia)}
-                  className={`p-2 rounded ${
-                    fechaSeleccionada ===
-                    `${anio}-${String(mes + 1).padStart(2, '0')}-${String(
-                      dia
-                    ).padStart(2, '0')}`
-                      ? 'bg-primary text-white'
-                      : 'hover:bg-secondary/30'
-                  }`}
+                  className={`p-2 rounded transition
+                    ${
+                      fechaSeleccionada ===
+                      `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`
+                        ? 'bg-[var(--primary)] text-white'
+                        : 'hover:bg-[var(--secondary)]/30'
+                    }`}
                 >
                   {dia}
                 </button>
