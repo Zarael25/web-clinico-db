@@ -3,19 +3,41 @@
 import { useRouter } from 'next/navigation'
 import ThemeToggle from './ThemeToggle'
 import { useEffect, useState } from 'react'
+import { getMe } from '@/services/auth'
 
 export default function Header() {
   const router = useRouter()
   const [nombreUsuario, setNombreUsuario] = useState<string>('')
 
   useEffect(() => {
-    const nombre = localStorage.getItem('usuario')
-    if (nombre) setNombreUsuario(nombre)
+    // Leer token de cookie
+    const token = document.cookie
+      .split('; ')
+      .find((c) => c.startsWith('token='))
+      ?.split('=')[1]
+
+    if (token) {
+      getMe(token)
+        .then((data) => {
+          if (data?.usuario) {
+            const nombreCompleto = `${data.usuario.nombre || ''} ${data.usuario.appaterno || ''} ${data.usuario.apmaterno || ''}`.trim()
+            setNombreUsuario(nombreCompleto)
+          }
+        })
+        .catch(() => {
+          // Si el token no sirve, cerramos sesión automáticamente
+          handleLogout()
+        })
+    } else {
+      handleLogout()
+    }
   }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('usuario')
+    // Borrar cookie del token
+    document.cookie = 'token=; path=/; max-age=0'
+
+    // Redirigir a login
     router.push('/auth/login')
   }
 

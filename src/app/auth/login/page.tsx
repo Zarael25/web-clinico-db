@@ -22,16 +22,10 @@ export default function LoginPage() {
       setMensaje(data.message)
       console.log('Token recibido:', data.token)
 
-      // Guardar token y nombre de usuario
-      localStorage.setItem('token', data.token)
+      // Guardar token en cookie con expiración
+      const expires = new Date(Date.now() + 60 * 60 * 1000).toUTCString() // 1 hora
+      document.cookie = `token=${data.token}; path=/; max-age=3600; samesite=lax`;
 
-      // Guardar nombre completo (nombre + appaterno)
-      if (data.usuario?.nombre || data.usuario?.appaterno || data.usuario?.apmaterno) {
-        const nombreCompleto = `${data.usuario?.nombre || ''} ${data.usuario?.appaterno || ''} ${data.usuario?.apmaterno || ''}`.trim()
-        localStorage.setItem('usuario', nombreCompleto)
-      } else {
-        localStorage.removeItem('usuario') // evita mostrar carnet
-      }
       // Redirigir a estudiantes
       router.push('/estudiantes')
     } catch (err: any) {
@@ -98,14 +92,9 @@ export default function LoginPage() {
           Entrar
         </button>
 
-        {mensaje && (
-          <p className="mt-4 text-green-500 text-center">{mensaje}</p>
-        )}
-        {error && (
-          <p className="mt-4 text-red-500 text-center">{error}</p>
-        )}
+        {mensaje && <p className="mt-4 text-green-500 text-center">{mensaje}</p>}
+        {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
       </form>
     </div>
-
   )
 }
