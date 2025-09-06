@@ -8,12 +8,15 @@ import DatosPersonales from '@/app/components/DatosPersonales'
 import NuevaAtencion from '@/app/components/NuevaAtencion'
 import AgregarAtencion from '@/app/components/AgregarAtencion'
 import { getEstudianteById } from '@/services/estudiantes'
+import { getCondicionBaseByEstudiante } from '@/services/condicionBase'
 
 export default function ClinicoHistorialPage() {
   const params = useParams()
   const estudianteId = params?.id as string
   const [estudiante, setEstudiante] = useState<any>(null)
   const [seccionActiva, setSeccionActiva] = useState<'datos' | 'nueva' | 'historial' | 'agregar'>('datos')
+  const [condicionBase, setCondicionBase] = useState<any>(null)
+
 
   const token =
     typeof document !== 'undefined'
@@ -25,6 +28,12 @@ export default function ClinicoHistorialPage() {
       getEstudianteById(estudianteId, token)
         .then((data) => setEstudiante(data))
         .catch((err) => console.error('Error cargando estudiante:', err))
+
+
+      getCondicionBaseByEstudiante(estudianteId, token)
+        .then((data) => setCondicionBase(data))
+        .catch((err) => console.error('Error cargando condición base:', err))
+
     }
   }, [estudianteId, token])
 
@@ -86,15 +95,24 @@ export default function ClinicoHistorialPage() {
 
         {/* Contenido central dinámico */}
         <section className="md:col-span-3 border border-[var(--border)] rounded-xl p-4 min-h-[300px]">
-          {seccionActiva === 'datos' && <DatosPersonales estudiante={estudiante} />}
+          {seccionActiva === 'datos' && (
+            <DatosPersonales estudiante={estudiante} condicionBase={condicionBase} />
+          )}
+
+
+
           {seccionActiva === 'nueva' && (
             <NuevaAtencion
-              alergias={estudiante?.alergias || []}
-              condicion={estudiante?.condicionBase || ''}
-              vacunas={estudiante?.vacunas || []}
+              alergias={condicionBase?.alergias || []} 
+              condicion={condicionBase?.condicion || ''} 
+              vacunas={condicionBase?.vacunas || []} 
               onAgregarClick={() => setSeccionActiva('agregar')}
             />
           )}
+
+
+
+
           {seccionActiva === 'historial' && (
             <p className="text-center text-[var(--foreground)]/70">Historial médico del estudiante (pendiente)</p>
           )}
