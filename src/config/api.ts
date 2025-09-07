@@ -30,7 +30,7 @@ export const ENDPOINTS = {
       PATCH: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}/alergias`, // añadir una
     },
 
-    //  (Opcional: luego puedes hacer lo mismo para vacunas)
+    //  luego puedes hacer lo mismo para vacunas)
     VACUNAS: {
       GET: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}/vacunas`,
       PUT: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}/vacunas`,

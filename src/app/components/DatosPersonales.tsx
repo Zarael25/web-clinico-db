@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import EditarCondicionBaseModal from '@/app/components/EditarCondicionBaseModal'
 import EditarAlergiasModal from '@/app/components/EditarAlergiasModal'
+import EditarVacunasModal from '@/app/components/EditarVacunasModal'
 
 type DatosPersonalesProps = {
   estudiante: any
@@ -12,24 +13,21 @@ type DatosPersonalesProps = {
 export default function DatosPersonales({ estudiante, condicionBase, token }: DatosPersonalesProps) {
   const [isCondicionModalOpen, setIsCondicionModalOpen] = useState(false)
   const [isAlergiasModalOpen, setIsAlergiasModalOpen] = useState(false)
+  const [isVacunasModalOpen, setIsVacunasModalOpen] = useState(false)
 
   const [condicion, setCondicion] = useState(condicionBase?.condicion || '')
   const [alergias, setAlergias] = useState<{ alergia: string }[]>(condicionBase?.alergias || [])
+  const [vacunas, setVacunas] = useState<{ vacuna: string }[]>(condicionBase?.vacunas || [])
 
   useEffect(() => {
-    if (condicionBase?.condicion) {
-      setCondicion(condicionBase.condicion)
-    }
-    if (condicionBase?.alergias) {
-      setAlergias(condicionBase.alergias)
-    }
+    if (condicionBase?.condicion) setCondicion(condicionBase.condicion)
+    if (condicionBase?.alergias) setAlergias(condicionBase.alergias)
+    if (condicionBase?.vacunas) setVacunas(condicionBase.vacunas)
   }, [condicionBase])
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-titulo text-[var(--primary)] mb-4">
-        Datos Personales
-      </h2>
+      <h2 className="text-2xl font-titulo text-[var(--primary)] mb-4">Datos Personales</h2>
 
       {/* Tutores */}
       <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-sm p-5">
@@ -133,6 +131,7 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-subtitulo text-[var(--foreground)]">Vacunas</h3>
           <button
+            onClick={() => setIsVacunasModalOpen(true)}
             className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
                        hover:bg-[var(--secondary)] transition-colors ml-2"
           >
@@ -140,9 +139,9 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
           </button>
         </div>
 
-        {condicionBase?.vacunas?.length > 0 ? (
+        {vacunas?.length > 0 ? (
           <div className="flex flex-wrap gap-3">
-            {condicionBase.vacunas.map((v: any, idx: number) => (
+            {vacunas.map((v, idx) => (
               <div
                 key={idx}
                 className="px-4 py-2 border border-[var(--border)] rounded-lg shadow-sm bg-[var(--background)] text-sm"
@@ -155,6 +154,15 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
           <p className="text-sm text-[var(--foreground)]/70">No registradas</p>
         )}
       </div>
+
+      {/* Modal Vacunas */}
+      <EditarVacunasModal
+        isOpen={isVacunasModalOpen}
+        onClose={() => setIsVacunasModalOpen(false)}
+        estudianteId={estudiante._id}
+        token={token}
+        onUpdated={(nuevasVacunas) => setVacunas(nuevasVacunas)}
+      />
     </div>
   )
 }

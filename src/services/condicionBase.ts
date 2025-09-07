@@ -71,3 +71,38 @@ export async function updateAlergias(estudianteId: string, alergias: { alergia: 
 
   return response.json()
 }
+
+
+// Obtener vacunas de un estudiante
+export async function getVacunasByEstudiante(estudianteId: string, token: string) {
+  const response = await fetch(ENDPOINTS.CONDICION_BASE.VACUNAS.GET(estudianteId), {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Error al obtener las vacunas')
+  }
+
+  return response.json()
+}
+
+// Actualizar todas las vacunas (PUT)
+export async function updateVacunas(estudianteId: string, vacunas: { vacuna: string }[], token: string) {
+  const response = await fetch(ENDPOINTS.CONDICION_BASE.VACUNAS.PUT(estudianteId), {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ vacunas }),
+  })
+
+  if (!response.ok) {
+    throw new Error('Error al actualizar las vacunas')
+  }
+
+  return response.json()
+}
