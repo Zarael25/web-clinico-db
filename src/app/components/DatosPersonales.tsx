@@ -1,11 +1,29 @@
 'use client'
+import { useState, useEffect } from 'react'
+import EditarCondicionBaseModal from '@/app/components/EditarCondicionBaseModal'
+
+
 
 type DatosPersonalesProps = {
   estudiante: any
   condicionBase?: any
+  token: string
 }
 
-export default function DatosPersonales({ estudiante, condicionBase }: DatosPersonalesProps) {
+export default function DatosPersonales({ estudiante, condicionBase, token }: DatosPersonalesProps) {
+  
+  
+  
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [condicion, setCondicion] = useState(condicionBase?.condicion || '')
+  
+  
+  useEffect(() => {
+    if (condicionBase?.condicion) {
+      setCondicion(condicionBase.condicion)
+    }
+  }, [condicionBase])
+  
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-titulo text-[var(--primary)] mb-4">
@@ -44,6 +62,7 @@ export default function DatosPersonales({ estudiante, condicionBase }: DatosPers
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-subtitulo text-[var(--foreground)]">Condición base</h3>
           <button
+            onClick={() => setIsModalOpen(true)}
             className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
                        hover:bg-[var(--secondary)] transition-colors ml-2"
           >
@@ -51,17 +70,29 @@ export default function DatosPersonales({ estudiante, condicionBase }: DatosPers
           </button>
         </div>
 
-
-
-
-        {condicionBase?.condicion ? (
+        {condicion ? (
           <div className="inline-block px-4 py-2 border border-[var(--border)] rounded-lg shadow-sm bg-[var(--background)] text-sm">
-            {condicionBase.condicion}
+            {condicion}
           </div>
         ) : (
           <p className="text-sm text-[var(--foreground)]/70">No registrada</p>
         )}
       </div>
+
+      {/* Modal */}
+      <EditarCondicionBaseModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        estudianteId={estudiante._id}
+        condicionActual={condicion}
+        token={token}
+        onUpdated={(nuevaCondicion) => setCondicion(nuevaCondicion)}
+      />
+
+
+
+
+
 
       {/* Alergias */}
       <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-sm p-5">

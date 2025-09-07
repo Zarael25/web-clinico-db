@@ -19,6 +19,8 @@ export const ENDPOINTS = {
 
   CONDICION_BASE: {
     DETALLE: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}`, // 👈 nuevo
+    EDITAR: (idUsuario: string) =>
+      `${API_BASE_URL}/v1/condicion-base/${idUsuario}/condicion`, // 👈 PATCH
   },
 
 

@@ -20,7 +20,7 @@ export default function ClinicoHistorialPage() {
 
   const token =
     typeof document !== 'undefined'
-      ? document.cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1]
+      ? document.cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1] || '' 
       : ''
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function ClinicoHistorialPage() {
           {estudiante ? (
             <>
               <h2 className="text-xl font-bold text-[var(--primary)]">
-                {estudiante.nombre} {estudiante.appaterno} {estudiante.apmaterno}
+                {estudiante?.nombre} {estudiante?.appaterno} {estudiante?.apmaterno}
               </h2>
               <p className="text-sm mt-2">Curso: {estudiante.gestiones?.[0]?.curso || '—'}</p>
               <p className="text-sm">Nivel: {estudiante.gestiones?.[0]?.nivel || '—'}</p>
@@ -95,13 +95,13 @@ export default function ClinicoHistorialPage() {
 
         {/* Contenido central dinámico */}
         <section className="md:col-span-3 border border-[var(--border)] rounded-xl p-4 min-h-[300px]">
-          {seccionActiva === 'datos' && (
-            <DatosPersonales estudiante={estudiante} condicionBase={condicionBase} />
+          {seccionActiva === 'datos' && estudiante && (
+            <DatosPersonales estudiante={estudiante} condicionBase={condicionBase} token={token} />
           )}
 
 
 
-          {seccionActiva === 'nueva' && (
+          {seccionActiva === 'nueva' && condicionBase && (
             <NuevaAtencion
               alergias={condicionBase?.alergias || []} 
               condicion={condicionBase?.condicion || ''} 
