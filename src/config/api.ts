@@ -21,8 +21,24 @@ export const ENDPOINTS = {
     DETALLE: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}`, // 👈 nuevo
     EDITAR: (idUsuario: string) =>
       `${API_BASE_URL}/v1/condicion-base/${idUsuario}/condicion`, // 👈 PATCH
-  },
 
+
+        //  NUEVOS ENDPOINTS PARA ALERGIAS
+    ALERGIAS: {
+      GET: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}/alergias`, // GET todas
+      PUT: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}/alergias`, // reemplazar lista
+      PATCH: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}/alergias`, // añadir una
+    },
+
+    //  (Opcional: luego puedes hacer lo mismo para vacunas)
+    VACUNAS: {
+      GET: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}/vacunas`,
+      PUT: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}/vacunas`,
+      PATCH: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}/vacunas`,
+    },
+
+
+  },
 
 
 };

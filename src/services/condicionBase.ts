@@ -35,3 +35,39 @@ export async function editarCondicionBase(estudianteId: string, condicion: strin
 
   return response.json()
 }
+
+
+
+// Obtener alergias de un estudiante
+export async function getAlergiasByEstudiante(estudianteId: string, token: string) {
+  const response = await fetch(ENDPOINTS.CONDICION_BASE.ALERGIAS.GET(estudianteId), {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Error al obtener las alergias')
+  }
+
+  return response.json()
+}
+
+// Actualizar todas las alergias (PUT)
+export async function updateAlergias(estudianteId: string, alergias: { alergia: string }[], token: string) {
+  const response = await fetch(ENDPOINTS.CONDICION_BASE.ALERGIAS.PUT(estudianteId), {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ alergias }),
+  })
+
+  if (!response.ok) {
+    throw new Error('Error al actualizar las alergias')
+  }
+
+  return response.json()
+}

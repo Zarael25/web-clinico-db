@@ -1,8 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import EditarCondicionBaseModal from '@/app/components/EditarCondicionBaseModal'
-
-
+import EditarAlergiasModal from '@/app/components/EditarAlergiasModal'
 
 type DatosPersonalesProps = {
   estudiante: any
@@ -11,19 +10,21 @@ type DatosPersonalesProps = {
 }
 
 export default function DatosPersonales({ estudiante, condicionBase, token }: DatosPersonalesProps) {
-  
-  
-  
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCondicionModalOpen, setIsCondicionModalOpen] = useState(false)
+  const [isAlergiasModalOpen, setIsAlergiasModalOpen] = useState(false)
+
   const [condicion, setCondicion] = useState(condicionBase?.condicion || '')
-  
-  
+  const [alergias, setAlergias] = useState<{ alergia: string }[]>(condicionBase?.alergias || [])
+
   useEffect(() => {
     if (condicionBase?.condicion) {
       setCondicion(condicionBase.condicion)
     }
+    if (condicionBase?.alergias) {
+      setAlergias(condicionBase.alergias)
+    }
   }, [condicionBase])
-  
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-titulo text-[var(--primary)] mb-4">
@@ -62,7 +63,7 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-subtitulo text-[var(--foreground)]">Condición base</h3>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsCondicionModalOpen(true)}
             className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
                        hover:bg-[var(--secondary)] transition-colors ml-2"
           >
@@ -79,26 +80,22 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
         )}
       </div>
 
-      {/* Modal */}
+      {/* Modal Condición */}
       <EditarCondicionBaseModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isCondicionModalOpen}
+        onClose={() => setIsCondicionModalOpen(false)}
         estudianteId={estudiante._id}
         condicionActual={condicion}
         token={token}
         onUpdated={(nuevaCondicion) => setCondicion(nuevaCondicion)}
       />
 
-
-
-
-
-
       {/* Alergias */}
       <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-sm p-5">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-subtitulo text-[var(--foreground)]">Alergias</h3>
           <button
+            onClick={() => setIsAlergiasModalOpen(true)}
             className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
                        hover:bg-[var(--secondary)] transition-colors ml-2"
           >
@@ -106,10 +103,9 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
           </button>
         </div>
 
-
-        {condicionBase?.alergias?.length > 0 ? (
+        {alergias?.length > 0 ? (
           <div className="flex flex-wrap gap-3">
-            {condicionBase.alergias.map((a: any, idx: number) => (
+            {alergias.map((a, idx) => (
               <div
                 key={idx}
                 className="px-4 py-2 border border-[var(--border)] rounded-lg shadow-sm bg-[var(--background)] text-sm"
@@ -121,8 +117,16 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
         ) : (
           <p className="text-sm text-[var(--foreground)]/70">No registradas</p>
         )}
-
       </div>
+
+      {/* Modal Alergias */}
+      <EditarAlergiasModal
+        isOpen={isAlergiasModalOpen}
+        onClose={() => setIsAlergiasModalOpen(false)}
+        estudianteId={estudiante._id}
+        token={token}
+        onUpdated={(nuevasAlergias) => setAlergias(nuevasAlergias)}
+      />
 
       {/* Vacunas */}
       <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-sm p-5">
