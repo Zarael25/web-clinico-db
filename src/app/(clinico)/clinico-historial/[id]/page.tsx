@@ -9,6 +9,7 @@ import NuevaAtencion from '@/app/components/NuevaAtencion'
 import AgregarAtencion from '@/app/components/AgregarAtencion'
 import { getEstudianteById } from '@/services/estudiantes'
 import { getCondicionBaseByEstudiante } from '@/services/condicionBase'
+import HistorialAtenciones from '@/app/components/HistorialAtenciones'
 
 export default function ClinicoHistorialPage() {
   const params = useParams()
@@ -114,7 +115,7 @@ export default function ClinicoHistorialPage() {
 
 
           {seccionActiva === 'historial' && (
-            <p className="text-center text-[var(--foreground)]/70">Historial médico del estudiante (pendiente)</p>
+            <HistorialAtenciones estudianteId={estudianteId} token={token} />
           )}
 
 
