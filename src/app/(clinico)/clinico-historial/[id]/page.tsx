@@ -9,6 +9,7 @@ import NuevaAtencion from '@/app/components/NuevaAtencion'
 import AgregarAtencion from '@/app/components/AgregarAtencion'
 import { getEstudianteById } from '@/services/estudiantes'
 import { getCondicionBaseByEstudiante } from '@/services/condicionBase'
+import { getAtencionesByEstudiante } from '@/services/atenciones'
 import HistorialAtenciones from '@/app/components/HistorialAtenciones'
 import DetalleAtencion from '@/app/components/DetalleAtencion'
 
@@ -19,6 +20,7 @@ export default function ClinicoHistorialPage() {
   const [seccionActiva, setSeccionActiva] = useState<'datos' | 'nueva' | 'historial' | 'agregar'>('datos')
   const [condicionBase, setCondicionBase] = useState<any>(null)
   const [atencionSeleccionada, setAtencionSeleccionada] = useState<string | null>(null)
+  const [atenciones, setAtenciones] = useState<any[]>([])
 
   const token =
     typeof document !== 'undefined'
@@ -31,13 +33,33 @@ export default function ClinicoHistorialPage() {
         .then((data) => setEstudiante(data))
         .catch((err) => console.error('Error cargando estudiante:', err))
 
-
       getCondicionBaseByEstudiante(estudianteId, token)
         .then((data) => setCondicionBase(data))
         .catch((err) => console.error('Error cargando condición base:', err))
 
+      getAtencionesByEstudiante(estudianteId, token)
+        .then((data) => {
+          // Ordenar de más reciente a más antigua
+          const ordenadas = [...data].sort(
+            (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+          )
+          setAtenciones(ordenadas)
+        })
+        .catch((err) => console.error('Error cargando atenciones:', err))
     }
   }, [estudianteId, token])
+
+  const convertirFecha = (fechaISO: string) => {
+    const fecha = new Date(fechaISO)
+    return fecha.toLocaleString('es-BO', {
+      timeZone: 'America/La_Paz',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
@@ -101,8 +123,6 @@ export default function ClinicoHistorialPage() {
             <DatosPersonales estudiante={estudiante} condicionBase={condicionBase} token={token} />
           )}
 
-
-
           {seccionActiva === 'nueva' && condicionBase && (
             <NuevaAtencion
               alergias={condicionBase?.alergias || []} 
@@ -111,9 +131,6 @@ export default function ClinicoHistorialPage() {
               onAgregarClick={() => setSeccionActiva('agregar')}
             />
           )}
-
-
-
 
           {seccionActiva === 'historial' && !atencionSeleccionada && (
             <HistorialAtenciones 
@@ -131,8 +148,6 @@ export default function ClinicoHistorialPage() {
             />
           )}
 
-
-
           {seccionActiva === 'agregar' && condicionBase && (
             <AgregarAtencion
               condicion={condicionBase?.condicion}
@@ -146,20 +161,27 @@ export default function ClinicoHistorialPage() {
               }}
             />
           )}
-
-
-
-
         </section>
 
         {/* Atenciones anteriores */}
         <aside className="md:col-span-1 border border-[var(--border)] rounded-xl p-4">
           <h3 className="text-lg font-semibold mb-4 text-[var(--primary)]">Atenciones anteriores</h3>
           <ul className="space-y-2 text-sm">
-            <li>📅 2025-08-01 — 08:00</li>
-            <li>📅 2025-07-23 — 09:15</li>
-            <li>📅 2025-07-10 — 07:45</li>
-            <li>📅 2025-06-28 — 10:30</li>
+            {atenciones.length === 0 && (
+              <li className="text-[var(--foreground)]/70">Sin atenciones registradas</li>
+            )}
+            {atenciones.map((a) => (
+              <li
+                key={a._id}
+                className="cursor-pointer hover:text-[var(--primary)]"
+                onClick={() => {
+                  setSeccionActiva('historial')
+                  setAtencionSeleccionada(a._id)
+                }}
+              >
+                📅 {convertirFecha(a.fecha)}
+              </li>
+            ))}
           </ul>
         </aside>
       </main>
