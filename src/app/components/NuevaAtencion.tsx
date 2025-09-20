@@ -34,7 +34,7 @@ export default function NuevaAtencion({
           className="mt-4 bg-[var(--primary)] text-white px-5 py-2 rounded-lg font-semibold hover:bg-[var(--secondary)] transition-colors"
           onClick={onAgregarClick}
         >
-          Agregar
+          Agregar Nueva Atención
         </button>
       </div>
     </div>

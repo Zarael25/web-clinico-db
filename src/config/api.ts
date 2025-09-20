@@ -37,8 +37,19 @@ export const ENDPOINTS = {
       PATCH: (id: string) => `${API_BASE_URL}/v1/condicion-base/${id}/vacunas`,
     },
 
-
   },
 
+
+  ATENCIONES: {
+    CREATE: `${API_BASE_URL}/v1/atenciones/`,
+    DETALLE: (id: string) => `${API_BASE_URL}/v1/atenciones/${id}`,
+    POR_ESTUDIANTE: (id: string) =>
+      `${API_BASE_URL}/v1/atenciones/estudiante/${id}`,
+  },
+
+
+  MEDICAMENTOS: {
+    LIST: `${API_BASE_URL}/v1/medicamentos/`,
+  },
 
 };

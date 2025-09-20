@@ -116,7 +116,22 @@ export default function ClinicoHistorialPage() {
           {seccionActiva === 'historial' && (
             <p className="text-center text-[var(--foreground)]/70">Historial médico del estudiante (pendiente)</p>
           )}
-          {seccionActiva === 'agregar' && <AgregarAtencion />}
+
+
+
+          {seccionActiva === 'agregar' && condicionBase && (
+            <AgregarAtencion
+              condicion={condicionBase?.condicion}
+              alergias={condicionBase?.alergias || []}
+              vacunas={condicionBase?.vacunas || []}
+              estudianteId={estudianteId}
+              token={token}
+            />
+          )}
+
+
+
+
         </section>
 
         {/* Atenciones anteriores */}
