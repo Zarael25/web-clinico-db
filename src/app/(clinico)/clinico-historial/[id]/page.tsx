@@ -10,6 +10,7 @@ import AgregarAtencion from '@/app/components/AgregarAtencion'
 import { getEstudianteById } from '@/services/estudiantes'
 import { getCondicionBaseByEstudiante } from '@/services/condicionBase'
 import HistorialAtenciones from '@/app/components/HistorialAtenciones'
+import DetalleAtencion from '@/app/components/DetalleAtencion'
 
 export default function ClinicoHistorialPage() {
   const params = useParams()
@@ -17,7 +18,7 @@ export default function ClinicoHistorialPage() {
   const [estudiante, setEstudiante] = useState<any>(null)
   const [seccionActiva, setSeccionActiva] = useState<'datos' | 'nueva' | 'historial' | 'agregar'>('datos')
   const [condicionBase, setCondicionBase] = useState<any>(null)
-
+  const [atencionSeleccionada, setAtencionSeleccionada] = useState<string | null>(null)
 
   const token =
     typeof document !== 'undefined'
@@ -114,8 +115,20 @@ export default function ClinicoHistorialPage() {
 
 
 
-          {seccionActiva === 'historial' && (
-            <HistorialAtenciones estudianteId={estudianteId} token={token} />
+          {seccionActiva === 'historial' && !atencionSeleccionada && (
+            <HistorialAtenciones 
+              estudianteId={estudianteId} 
+              token={token} 
+              onVerDetalle={(id) => setAtencionSeleccionada(id)} 
+            />
+          )}
+
+          {seccionActiva === 'historial' && atencionSeleccionada && (
+            <DetalleAtencion 
+              atencionId={atencionSeleccionada} 
+              token={token} 
+              onVolver={() => setAtencionSeleccionada(null)} 
+            />
           )}
 
 
@@ -127,6 +140,10 @@ export default function ClinicoHistorialPage() {
               vacunas={condicionBase?.vacunas || []}
               estudianteId={estudianteId}
               token={token}
+              onAtencionCreada={(id) => {
+                setAtencionSeleccionada(id)
+                setSeccionActiva('historial')
+              }}
             />
           )}
 

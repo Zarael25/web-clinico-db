@@ -6,9 +6,10 @@ import { getAtencionesByEstudiante } from '@/services/atenciones'
 type HistorialAtencionesProps = {
   estudianteId: string
   token: string
+  onVerDetalle: (id: string) => void   // 👈 nuevo prop para manejar click
 }
 
-export default function HistorialAtenciones({ estudianteId, token }: HistorialAtencionesProps) {
+export default function HistorialAtenciones({ estudianteId, token, onVerDetalle }: HistorialAtencionesProps) {
   const [atenciones, setAtenciones] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -72,7 +73,7 @@ export default function HistorialAtenciones({ estudianteId, token }: HistorialAt
             <strong>Tratamiento:</strong> {atencion.tratamiento}
           </p>
 
-          <p className="text-sm">
+          <p className="text-sm mb-3">
             <strong>Sugerir baja:</strong>{' '}
             {atencion.sugerir_baja ? (
               <span className="text-[var(--error)]">Sí</span>
@@ -80,6 +81,14 @@ export default function HistorialAtenciones({ estudianteId, token }: HistorialAt
               <span className="text-[var(--success)]">No</span>
             )}
           </p>
+
+          {/* 👇 Botón para ver detalles */}
+          <button
+            onClick={() => onVerDetalle(atencion._id)}
+            className="mt-2 bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-[var(--secondary)] transition-colors"
+          >
+            Ver detalles
+          </button>
         </div>
       ))}
     </div>

@@ -4,6 +4,7 @@ import CondicionBaseDetalle from './CondicionBaseDetalle'
 import { useEffect, useState } from 'react'
 import { crearAtencion } from '@/services/atenciones'
 import { getMedicamentos } from '@/services/medicamentos'
+import { useRouter } from 'next/navigation'
 
 type AgregarAtencionProps = {
   condicion?: string
@@ -11,6 +12,7 @@ type AgregarAtencionProps = {
   vacunas?: { vacuna: string }[] | string[]
   estudianteId: string
   token: string
+  onAtencionCreada?: (id: string) => void
 }
 
 export default function AgregarAtencion({
@@ -19,6 +21,7 @@ export default function AgregarAtencion({
   vacunas = [],
   estudianteId,
   token,
+  onAtencionCreada,
 }: AgregarAtencionProps) {
   const [motivo, setMotivo] = useState('')
   const [diagnostico, setDiagnostico] = useState('')
@@ -29,6 +32,9 @@ export default function AgregarAtencion({
   const [medicamentosSeleccionados, setMedicamentosSeleccionados] = useState<
     { medicamento: string; dosis: string; via: string }[]
   >([])
+
+  const [loading, setLoading] = useState(false) // 👈 nuevo
+  const router = useRouter()
 
   useEffect(() => {
     if (token) {
@@ -53,6 +59,7 @@ export default function AgregarAtencion({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true) // 👈 activar
     try {
       const nuevaAtencion = await crearAtencion(
         estudianteId,
@@ -63,11 +70,19 @@ export default function AgregarAtencion({
         token,
         medicamentosSeleccionados
       )
+
       console.log('✅ Atención creada:', nuevaAtencion)
-      alert('Atención registrada con éxito')
+
+      if (onAtencionCreada) {
+        onAtencionCreada(nuevaAtencion._id)
+      } else {
+        router.push(`/clinico/atencion/${nuevaAtencion._id}`)
+      }
     } catch (error) {
       console.error('❌ Error al registrar la atención:', error)
       alert('Error al registrar la atención')
+    } finally {
+      setLoading(false) // 👈 desactivar
     }
   }
 
@@ -75,11 +90,10 @@ export default function AgregarAtencion({
     <div className="space-y-6">
       <h2 className="text-2xl font-titulo text-[var(--primary)] mb-4">Agregar Atención</h2>
 
-      {/* 👇 Mostramos primero la info clínica base */}
       <CondicionBaseDetalle condicion={condicion} alergias={alergias} vacunas={vacunas} />
 
-      {/* 👇 Formulario */}
       <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+        {/* Inputs */}
         <div>
           <label className="block text-sm font-semibold">Motivo de consulta</label>
           <input
@@ -122,7 +136,7 @@ export default function AgregarAtencion({
           <label className="text-sm">Sugerir baja</label>
         </div>
 
-        {/* 👉 Selección de medicamentos */}
+        {/* Selección de medicamentos */}
         <div>
           <label className="block text-sm font-semibold mb-2">Medicamentos</label>
           <select
@@ -193,11 +207,16 @@ export default function AgregarAtencion({
           </div>
         </div>
 
+        {/* Botón con loading */}
         <button
           type="submit"
-          className="bg-[var(--primary)] text-white px-5 py-2 rounded-lg font-semibold hover:bg-[var(--secondary)] transition-colors"
+          disabled={loading}
+          className={`px-5 py-2 rounded-lg font-semibold transition-colors 
+                      ${loading 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-[var(--primary)] text-white hover:bg-[var(--secondary)]'}`}
         >
-          Guardar Atención
+          {loading ? 'Guardando...' : 'Guardar Atención'}
         </button>
       </form>
     </div>
