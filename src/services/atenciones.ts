@@ -64,3 +64,26 @@ export async function getAtencionDetalle(atencionId: string, token: string) {
 
   return response.json()
 }
+
+
+// Listar atenciones por fecha
+export async function getAtencionesByFecha(fecha: string, token: string) {
+  const url = ENDPOINTS.ATENCIONES.POR_FECHA(fecha)
+
+  console.log("📡 Llamando a:", url)
+  console.log("🔑 Token enviado:", token ? `Bearer ${token.substring(0, 20)}...` : "VACÍO")
+
+  const response = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!response.ok) {
+    console.error("❌ Error status:", response.status)
+    throw new Error('Error al obtener las atenciones por fecha')
+  }
+
+  return response.json()
+}

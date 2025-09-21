@@ -1,47 +1,85 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Header from '../../components/Header'
 import NavTabs from '../../components/NavTabs'
+import { getAtencionesByFecha } from '@/services/atenciones'
+import DetalleAtencion from '@/app/components/DetalleAtencion'
 
 type Atencion = {
-  nombre: string
-  paralelo: string
-  turno: string
-  hora: string
+  _id: string
+  fecha: string
+  motivo_consulta: string
+  diagnostico: string
+  tratamiento: string
+  sugerir_baja: boolean
+  estudiante: {
+    _id: string
+    nombre: string
+    appaterno: string
+    apmaterno?: string
+    carnet: string
+    rude: string
+    gestiones: {
+      gestion: number
+      curso: string
+      cursoGob: string
+      nivel: string
+      reprobado: boolean
+    }[]
+  } | null
+  user: {
+    _id: string
+    nombre: string
+  }
 }
 
-// Datos de prueba
-const atencionesData: Record<string, Atencion[]> = {
-  '2025-04-25': [
-    { nombre: 'Alvaro Perez', paralelo: '4A', turno: 'PM', hora: '08:30' },
-    { nombre: 'Maria Lopez', paralelo: '3B', turno: 'SM', hora: '09:15' },
-    { nombre: 'Carlos Sanchez', paralelo: '5C', turno: 'PT', hora: '07:45' },
-    { nombre: 'Laura Fernandez', paralelo: '2A', turno: 'SM', hora: '10:00' },
-    { nombre: 'Pedro Vargas', paralelo: '1C', turno: 'PM', hora: '08:45' },
-    { nombre: 'Sofia Romero', paralelo: '6B', turno: 'SM', hora: '09:30' },
-    { nombre: 'Luis Gutierrez', paralelo: '2B', turno: 'PT', hora: '11:15' },
-    { nombre: 'Camila Morales', paralelo: '3A', turno: 'SM', hora: '07:30' },
-    { nombre: 'Jorge Castillo', paralelo: '5A', turno: 'PM', hora: '10:45' },
-    { nombre: 'Valentina Rios', paralelo: '4B', turno: 'SM', hora: '09:50' }
-  ],
-  '2025-04-26': [
-    { nombre: 'Laura Fernandez', paralelo: '2A', turno: 'SM', hora: '10:00' }
-  ]
+function getHoyISO() {
+  const hoy = new Date()
+  const yyyy = hoy.getFullYear()
+  const mm = String(hoy.getMonth() + 1).padStart(2, '0')
+  const dd = String(hoy.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
 }
 
 export default function ClinicoCalendarioPage() {
-  const [fechaSeleccionada, setFechaSeleccionada] = useState('2025-04-25')
-  const [mes, setMes] = useState(3) // Abril (0=Enero)
-  const [anio, setAnio] = useState(2025)
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(getHoyISO())
+  const [mes, setMes] = useState(new Date().getMonth())
+  const [anio, setAnio] = useState(new Date().getFullYear())
+  const [atenciones, setAtenciones] = useState<Atencion[]>([])
+  const [loading, setLoading] = useState(false)
 
-  // Atenciones ordenadas por hora
-  const atencionesHoy =
-    (atencionesData[fechaSeleccionada] || []).sort((a, b) =>
-      a.hora.localeCompare(b.hora)
-    )
+  // 👇 nuevo estado para detalle
+  const [atencionSeleccionada, setAtencionSeleccionada] = useState<string | null>(null)
 
-  // Generar días del calendario
+  const token =
+    typeof document !== 'undefined'
+      ? document.cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1] || ''
+      : ''
+
+  useEffect(() => {
+    const fetchAtenciones = async () => {
+      setLoading(true)
+      try {
+        const data = await getAtencionesByFecha(fechaSeleccionada, token)
+        setAtenciones(data)
+      } catch (err) {
+        console.error(err)
+        setAtenciones([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (token) {
+      fetchAtenciones()
+    }
+  }, [fechaSeleccionada, token])
+
+  const atencionesHoy = [...atenciones].sort(
+    (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+  )
+
   const diasEnMes = new Date(anio, mes + 1, 0).getDate()
   const primerDiaSemana = new Date(anio, mes, 1).getDay()
   const dias: (number | null)[] = []
@@ -53,7 +91,6 @@ export default function ClinicoCalendarioPage() {
     dias.push(i)
   }
 
-  // Función para seleccionar un día
   const seleccionarDia = (dia: number) => {
     const mesString = String(mes + 1).padStart(2, '0')
     const diaString = String(dia).padStart(2, '0')
@@ -61,8 +98,8 @@ export default function ClinicoCalendarioPage() {
   }
 
   const meses = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
   ]
 
   return (
@@ -70,44 +107,60 @@ export default function ClinicoCalendarioPage() {
       <Header />
       <NavTabs />
       <main className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* ===== LADO IZQUIERDO ===== */}
+        
+        {/* ===== LISTA ATENCIONES ===== */}
         <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-titulo">Atenciones</h2>
             <span className="font-subtitulo">{fechaSeleccionada}</span>
           </div>
-          {atencionesHoy.length > 0 ? (
-            <ul>
-              {atencionesHoy.map((a, i) => (
-                <li
-                  key={i}
-                  className="flex justify-between items-center border-b border-[var(--border)] py-2"
+          {loading ? (
+            <p className="font-parrafo text-gray-500">Cargando...</p>
+          ) : atencionesHoy.length > 0 ? (
+            <div className="grid gap-3">
+              {atencionesHoy.map((a) => (
+                <div
+                  key={a._id}
+                  className="p-4 border rounded-lg shadow-sm cursor-pointer hover:shadow-md transition"
+                  onClick={() => setAtencionSeleccionada(a._id)}
                 >
-                  <span className="font-parrafo">
-                    {a.nombre} {a.paralelo} {a.turno}
-                  </span>
-                  <span className="text-sm text-[var(--foreground)]">{a.hora}</span>
-                </li>
+                  <div className="flex justify-between">
+                    <span className="font-semibold">
+                      {a.estudiante
+                        ? `${a.estudiante.nombre} ${a.estudiante.appaterno}`
+                        : 'Estudiante desconocido'}
+                    </span>
+                    <span className="text-sm">
+                      {new Date(a.fecha).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500">Motivo: {a.motivo_consulta}</p>
+                  <p className="text-xs text-gray-400">Atendido por: {a.user?.nombre}</p>
+                </div>
               ))}
-            </ul>
+            </div>
           ) : (
-            <p className="font-parrafo text-gray-500">
-              No hay atenciones para esta fecha.
-            </p>
+            <p className="font-parrafo text-gray-500">No hay atenciones para esta fecha.</p>
           )}
         </div>
 
-        {/* ===== LADO DERECHO (CALENDARIO) ===== */}
+        {/* ===== CALENDARIO ===== */}
         <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow p-4">
-          {/* Selección de mes y año */}
           <div className="flex justify-center gap-4 mb-4">
             <select
               value={mes}
               onChange={(e) => setMes(Number(e.target.value))}
-              className="p-2 border border-[var(--border)] rounded font-subtitulo"
+              className="w-auto border rounded-lg px-3 py-2 
+                         bg-[var(--background)] text-[var(--foreground)] 
+                         focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
             >
               {meses.map((m, i) => (
-                <option key={i} value={i}>{m}</option>
+                <option key={i} value={i} className="bg-[var(--background)] text-[var(--foreground)]">
+                  {m}
+                </option>
               ))}
             </select>
 
@@ -115,29 +168,27 @@ export default function ClinicoCalendarioPage() {
               type="number"
               value={anio}
               onChange={(e) => setAnio(Number(e.target.value))}
-              className="w-24 p-2 border border-[var(--border)] rounded font-subtitulo"
+              className="w-24 border rounded-lg px-3 py-2 
+                         bg-[var(--background)] text-[var(--foreground)] 
+                         focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
             />
           </div>
 
-          {/* Calendario en grilla */}
           <div className="grid grid-cols-7 gap-2 text-center">
-            {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((d) => (
-              <div key={d} className="font-subtitulo text-gray-500">
-                {d}
-              </div>
+            {['L','M','X','J','V','S','D'].map((d) => (
+              <div key={d} className="font-subtitulo text-gray-500">{d}</div>
             ))}
             {dias.map((dia, i) =>
               dia ? (
                 <button
                   key={i}
                   onClick={() => seleccionarDia(dia)}
-                  className={`p-2 rounded transition
-                    ${
-                      fechaSeleccionada ===
-                      `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`
-                        ? 'bg-[var(--primary)] text-white'
-                        : 'hover:bg-[var(--secondary)]/30'
-                    }`}
+                  className={`p-2 rounded transition ${
+                    fechaSeleccionada ===
+                    `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`
+                      ? 'bg-[var(--primary)] text-white'
+                      : 'hover:bg-[var(--secondary)]/30'
+                  }`}
                 >
                   {dia}
                 </button>
@@ -148,6 +199,19 @@ export default function ClinicoCalendarioPage() {
           </div>
         </div>
       </main>
+
+      {/* ===== MODAL DETALLE ===== */}
+      {atencionSeleccionada && (
+        <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
+          <div className="bg-[var(--background)] text-[var(--foreground)] p-6 rounded-lg max-w-lg w-full shadow-lg overflow-y-auto max-h-[90vh]">
+            <DetalleAtencion
+              atencionId={atencionSeleccionada}
+              token={token}
+              onVolver={() => setAtencionSeleccionada(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

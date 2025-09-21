@@ -186,7 +186,9 @@ export default function AgregarAtencion({
                       newMeds[idx].via = e.target.value
                       setMedicamentosSeleccionados(newMeds)
                     }}
-                    className="w-full border rounded-lg px-3 py-1"
+                    className="border rounded-lg px-3 py-2 
+                        bg-[var(--background)] text-[var(--foreground)] 
+                        focus:outline-none focus:ring-2 focus:ring-[var(--primary)] w-auto"
                   >
                     <option value="ORAL">ORAL</option>
                     <option value="INTRAVENOSA">INTRAVENOSA</option>

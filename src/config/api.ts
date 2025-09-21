@@ -45,6 +45,9 @@ export const ENDPOINTS = {
     DETALLE: (id: string) => `${API_BASE_URL}/v1/atenciones/${id}`,
     POR_ESTUDIANTE: (id: string) =>
       `${API_BASE_URL}/v1/atenciones/estudiante/${id}`,
+    POR_FECHA: (fecha: string) =>
+      `${API_BASE_URL}/v1/atenciones/fecha?fecha=${fecha}`,
+
   },
 
 
