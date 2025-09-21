@@ -48,6 +48,14 @@ export const ENDPOINTS = {
     POR_FECHA: (fecha: string) =>
       `${API_BASE_URL}/v1/atenciones/fecha?fecha=${fecha}`,
 
+    REPORTE: (anio?: string, mes?: string, dia?: string) => {
+      let url = `${API_BASE_URL}/v1/atenciones/reporte/pdf?`
+      if (anio) url += `anio=${anio}&`
+      if (mes) url += `mes=${mes}&`
+      if (dia) url += `dia=${dia}&`
+      return url.slice(0, -1) // quitar último "&" o "?"
+    },
+
   },
 
 

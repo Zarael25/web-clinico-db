@@ -87,3 +87,28 @@ export async function getAtencionesByFecha(fecha: string, token: string) {
 
   return response.json()
 }
+
+
+// Descargar reporte PDF de atenciones
+export async function descargarReporteAtenciones(
+  token: string,
+  anio?: string,
+  mes?: string,
+  dia?: string
+) {
+  const url = ENDPOINTS.ATENCIONES.REPORTE(anio, mes, dia)
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Error al generar el reporte PDF')
+  }
+
+  // 👇 lo devuelve como Blob para poder descargarlo en el navegador
+  const blob = await response.blob()
+  return blob
+}

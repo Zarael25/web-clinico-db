@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Header from '../../components/Header'
 import NavTabs from '../../components/NavTabs'
-import { getAtencionesByFecha } from '@/services/atenciones'
+import { getAtencionesByFecha, descargarReporteAtenciones } from '@/services/atenciones'
 import DetalleAtencion from '@/app/components/DetalleAtencion'
 
 type Atencion = {
@@ -43,13 +43,18 @@ function getHoyISO() {
 }
 
 export default function ClinicoCalendarioPage() {
+  // 📅 Estados para el calendario
   const [fechaSeleccionada, setFechaSeleccionada] = useState(getHoyISO())
-  const [mes, setMes] = useState(new Date().getMonth())
-  const [anio, setAnio] = useState(new Date().getFullYear())
+  const [mesCal, setMesCal] = useState(new Date().getMonth())
+  const [anioCal, setAnioCal] = useState(new Date().getFullYear())
+
+  // 📊 Estados para el reporte (independientes)
+  const [anioReporte, setAnioReporte] = useState(new Date().getFullYear())
+  const [mesReporte, setMesReporte] = useState<number | undefined>(undefined)
+  const [diaReporte, setDiaReporte] = useState<number | undefined>(undefined)
+
   const [atenciones, setAtenciones] = useState<Atencion[]>([])
   const [loading, setLoading] = useState(false)
-
-  // 👇 nuevo estado para detalle
   const [atencionSeleccionada, setAtencionSeleccionada] = useState<string | null>(null)
 
   const token =
@@ -57,6 +62,7 @@ export default function ClinicoCalendarioPage() {
       ? document.cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1] || ''
       : ''
 
+  // Cargar atenciones por fecha seleccionada (solo calendario)
   useEffect(() => {
     const fetchAtenciones = async () => {
       setLoading(true)
@@ -80,8 +86,9 @@ export default function ClinicoCalendarioPage() {
     (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
   )
 
-  const diasEnMes = new Date(anio, mes + 1, 0).getDate()
-  const primerDiaSemana = new Date(anio, mes, 1).getDay()
+  // 📆 lógica calendario
+  const diasEnMes = new Date(anioCal, mesCal + 1, 0).getDate()
+  const primerDiaSemana = new Date(anioCal, mesCal, 1).getDay()
   const dias: (number | null)[] = []
 
   for (let i = 0; i < (primerDiaSemana === 0 ? 6 : primerDiaSemana - 1); i++) {
@@ -92,9 +99,29 @@ export default function ClinicoCalendarioPage() {
   }
 
   const seleccionarDia = (dia: number) => {
-    const mesString = String(mes + 1).padStart(2, '0')
+    const mesString = String(mesCal + 1).padStart(2, '0')
     const diaString = String(dia).padStart(2, '0')
-    setFechaSeleccionada(`${anio}-${mesString}-${diaString}`)
+    setFechaSeleccionada(`${anioCal}-${mesString}-${diaString}`)
+  }
+
+  // 📑 función descargar reporte (usa estados separados)
+  const handleDescargarReporte = async () => {
+    try {
+      const blob = await descargarReporteAtenciones(
+        token,
+        String(anioReporte),
+        mesReporte ? String(mesReporte) : undefined,
+        diaReporte ? String(diaReporte) : undefined
+      )
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'reporte-atenciones.pdf'
+      link.click()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('❌ Error al descargar el reporte:', err)
+    }
   }
 
   const meses = [
@@ -151,26 +178,22 @@ export default function ClinicoCalendarioPage() {
         <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow p-4">
           <div className="flex justify-center gap-4 mb-4">
             <select
-              value={mes}
-              onChange={(e) => setMes(Number(e.target.value))}
+              value={mesCal}
+              onChange={(e) => setMesCal(Number(e.target.value))}
               className="w-auto border rounded-lg px-3 py-2 
                          bg-[var(--background)] text-[var(--foreground)] 
                          focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
             >
               {meses.map((m, i) => (
-                <option key={i} value={i} className="bg-[var(--background)] text-[var(--foreground)]">
-                  {m}
-                </option>
+                <option key={i} value={i}>{m}</option>
               ))}
             </select>
 
             <input
               type="number"
-              value={anio}
-              onChange={(e) => setAnio(Number(e.target.value))}
-              className="w-24 border rounded-lg px-3 py-2 
-                         bg-[var(--background)] text-[var(--foreground)] 
-                         focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+              value={anioCal}
+              onChange={(e) => setAnioCal(Number(e.target.value))}
+              className="w-24 border rounded-lg px-3 py-2"
             />
           </div>
 
@@ -185,7 +208,7 @@ export default function ClinicoCalendarioPage() {
                   onClick={() => seleccionarDia(dia)}
                   className={`p-2 rounded transition ${
                     fechaSeleccionada ===
-                    `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`
+                    `${anioCal}-${String(mesCal + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`
                       ? 'bg-[var(--primary)] text-white'
                       : 'hover:bg-[var(--secondary)]/30'
                   }`}
@@ -199,6 +222,55 @@ export default function ClinicoCalendarioPage() {
           </div>
         </div>
       </main>
+
+      {/* ===== FOOTER DE REPORTE (INDEPENDIENTE) ===== */}
+      <div className="p-6 border-t border-[var(--border)] bg-[var(--backgroundAlt)]">
+        <h3 className="text-lg font-semibold mb-2">Generar reporte PDF</h3>
+        <div className="flex flex-wrap gap-2 items-center">
+          {/* Año obligatorio */}
+          <input
+            type="number"
+            value={anioReporte}
+            onChange={(e) => setAnioReporte(Number(e.target.value))}
+            className="w-24 border rounded px-2 py-1"
+          />
+
+          {/* Mes como lista (con opción "Ninguno") */}
+          <select
+            value={mesReporte ?? ''}
+            onChange={(e) =>
+              setMesReporte(e.target.value ? Number(e.target.value) : undefined)
+            }
+            className="w-40 border rounded px-2 py-1 
+                      bg-[var(--background)] text-[var(--foreground)]"
+          >
+            <option value="">Ninguno</option>
+            {meses.map((m, i) => (
+              <option key={i} value={i + 1}>
+                {m}
+              </option>
+            ))}
+          </select>
+
+          {/* Día opcional */}
+          <input
+            type="number"
+            min={1}
+            max={31}
+            value={diaReporte ?? ''}
+            placeholder="Día (opcional)"
+            onChange={(e) => setDiaReporte(e.target.value ? Number(e.target.value) : undefined)}
+            className="w-28 border rounded px-2 py-1"
+          />
+
+          <button
+            onClick={handleDescargarReporte}
+            className="bg-[var(--primary)] text-white px-4 py-2 rounded hover:bg-[var(--secondary)]"
+          >
+            Descargar PDF
+          </button>
+        </div>
+      </div>
 
       {/* ===== MODAL DETALLE ===== */}
       {atencionSeleccionada && (
