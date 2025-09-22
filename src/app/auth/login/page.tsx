@@ -26,6 +26,9 @@ export default function LoginPage() {
       const expires = new Date(Date.now() + 60 * 60 * 1000).toUTCString() // 1 hora
       document.cookie = `token=${data.token}; path=/; max-age=3600; samesite=lax`;
 
+      // ✅ Guardar usuario en localStorage
+      localStorage.setItem('usuario', JSON.stringify(data.usuario))
+
       // Redirigir a estudiantes
       router.push('/estudiantes')
     } catch (err: any) {

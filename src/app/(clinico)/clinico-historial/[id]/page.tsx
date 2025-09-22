@@ -21,11 +21,27 @@ export default function ClinicoHistorialPage() {
   const [condicionBase, setCondicionBase] = useState<any>(null)
   const [atencionSeleccionada, setAtencionSeleccionada] = useState<string | null>(null)
   const [atenciones, setAtenciones] = useState<any[]>([])
+  const [rolesUsuario, setRolesUsuario] = useState<string[]>([])
 
   const token =
     typeof document !== 'undefined'
       ? document.cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1] || '' 
       : ''
+
+  useEffect(() => {
+    // Leer usuario desde localStorage
+    if (typeof window !== 'undefined') {
+      const usuarioStr = localStorage.getItem('usuario')
+      if (usuarioStr) {
+        try {
+          const usuario = JSON.parse(usuarioStr)
+          setRolesUsuario(usuario.roles || [])
+        } catch (err) {
+          console.error('Error parseando usuario desde localStorage:', err)
+        }
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (estudianteId && token) {
@@ -61,6 +77,9 @@ export default function ClinicoHistorialPage() {
     })
   }
 
+  // 👇 Solo admin o enfermeria pueden ver el botón
+  const puedeCrearAtencion = rolesUsuario.includes('admin') || rolesUsuario.includes('enfermeria')
+
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <Header />
@@ -89,16 +108,18 @@ export default function ClinicoHistorialPage() {
                   Datos
                 </button>
 
-                <button
-                  className={`w-full py-2 rounded-lg font-semibold transition-colors ${
-                    seccionActiva === 'nueva'
-                      ? 'bg-[var(--primary)] text-white'
-                      : 'bg-[var(--background)] text-[var(--foreground)] border border-[var(--border)] hover:bg-[var(--secondary)]/20'
-                  }`}
-                  onClick={() => setSeccionActiva('nueva')}
-                >
-                  Nueva Atención
-                </button>
+                {puedeCrearAtencion && (
+                  <button
+                    className={`w-full py-2 rounded-lg font-semibold transition-colors ${
+                      seccionActiva === 'nueva'
+                        ? 'bg-[var(--primary)] text-white'
+                        : 'bg-[var(--background)] text-[var(--foreground)] border border-[var(--border)] hover:bg-[var(--secondary)]/20'
+                    }`}
+                    onClick={() => setSeccionActiva('nueva')}
+                  >
+                    Nueva Atención
+                  </button>
+                )}
 
                 <button
                   className={`w-full py-2 rounded-lg font-semibold transition-colors ${
@@ -123,7 +144,7 @@ export default function ClinicoHistorialPage() {
             <DatosPersonales estudiante={estudiante} condicionBase={condicionBase} token={token} />
           )}
 
-          {seccionActiva === 'nueva' && condicionBase && (
+          {seccionActiva === 'nueva' && condicionBase && puedeCrearAtencion && (
             <NuevaAtencion
               alergias={condicionBase?.alergias || []} 
               condicion={condicionBase?.condicion || ''} 
@@ -148,7 +169,7 @@ export default function ClinicoHistorialPage() {
             />
           )}
 
-          {seccionActiva === 'agregar' && condicionBase && (
+          {seccionActiva === 'agregar' && condicionBase && puedeCrearAtencion && (
             <AgregarAtencion
               condicion={condicionBase?.condicion}
               alergias={condicionBase?.alergias || []}
