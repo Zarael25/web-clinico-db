@@ -57,10 +57,21 @@ export default function ClinicoCalendarioPage() {
   const [loading, setLoading] = useState(false)
   const [atencionSeleccionada, setAtencionSeleccionada] = useState<string | null>(null)
 
+  const [usuario, setUsuario] = useState<any>(null)
+
   const token =
     typeof document !== 'undefined'
       ? document.cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1] || ''
       : ''
+
+  // 🔑 Recuperar usuario de localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem('usuario')
+    if (storedUser) {
+      setUsuario(JSON.parse(storedUser))
+    }
+  }, [])
+
 
   // Cargar atenciones por fecha seleccionada (solo calendario)
   useEffect(() => {
@@ -86,6 +97,16 @@ export default function ClinicoCalendarioPage() {
     (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
   )
 
+  // ✅ Solo estos roles pueden ver detalle
+  const rolesPermitidos = ['admin', 'enfermeria']
+  const puedeVerDetalles = usuario?.roles?.some((r: string) => rolesPermitidos.includes(r)) // ⬅️ verificación
+
+  const handleClickAtencion = (id: string) => {
+    if (puedeVerDetalles) {
+      setAtencionSeleccionada(id)
+    }
+  }
+  
   // 📆 lógica calendario
   const diasEnMes = new Date(anioCal, mesCal + 1, 0).getDate()
   const primerDiaSemana = new Date(anioCal, mesCal, 1).getDay()
@@ -148,8 +169,10 @@ export default function ClinicoCalendarioPage() {
               {atencionesHoy.map((a) => (
                 <div
                   key={a._id}
-                  className="p-4 border rounded-lg shadow-sm cursor-pointer hover:shadow-md transition"
-                  onClick={() => setAtencionSeleccionada(a._id)}
+                  className={`p-4 border rounded-lg shadow-sm transition ${
+                    puedeVerDetalles ? 'cursor-pointer hover:shadow-md' : ''
+                  }`}
+                  onClick={puedeVerDetalles ? () => handleClickAtencion(a._id) : undefined} // ⬅️ cambio
                 >
                   <div className="flex justify-between">
                     <span className="font-semibold">
@@ -273,7 +296,7 @@ export default function ClinicoCalendarioPage() {
       </div>
 
       {/* ===== MODAL DETALLE ===== */}
-      {atencionSeleccionada && (
+      {atencionSeleccionada && puedeVerDetalles && ( // ⬅️ solo renderizar modal si tiene permiso
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
           <div className="bg-[var(--background)] text-[var(--foreground)] p-6 rounded-lg max-w-lg w-full shadow-lg overflow-y-auto max-h-[90vh]">
             <DetalleAtencion
