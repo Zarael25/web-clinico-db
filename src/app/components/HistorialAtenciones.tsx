@@ -6,12 +6,21 @@ import { getAtencionesByEstudiante } from '@/services/atenciones'
 type HistorialAtencionesProps = {
   estudianteId: string
   token: string
-  onVerDetalle: (id: string) => void   // 👈 nuevo prop para manejar click
+  onVerDetalle: (id: string) => void
 }
 
 export default function HistorialAtenciones({ estudianteId, token, onVerDetalle }: HistorialAtencionesProps) {
   const [atenciones, setAtenciones] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [usuario, setUsuario] = useState<any>(null)
+
+  useEffect(() => {
+    // 👤 Recuperar usuario desde localStorage
+    const storedUser = localStorage.getItem('usuario')
+    if (storedUser) {
+      setUsuario(JSON.parse(storedUser))
+    }
+  }, [])
 
   useEffect(() => {
     if (estudianteId && token) {
@@ -46,6 +55,10 @@ export default function HistorialAtenciones({ estudianteId, token, onVerDetalle 
   if (atenciones.length === 0) {
     return <p className="text-center text-[var(--foreground)]/70">No hay atenciones registradas</p>
   }
+
+  // 🔑 Revisar si el usuario tiene rol permitido
+  const puedeVerDetalles =
+    usuario?.roles?.some((rol: string) => ['admin', 'enfermeria'].includes(rol))
 
   return (
     <div className="space-y-4">
@@ -82,13 +95,15 @@ export default function HistorialAtenciones({ estudianteId, token, onVerDetalle 
             )}
           </p>
 
-          {/* 👇 Botón para ver detalles */}
-          <button
-            onClick={() => onVerDetalle(atencion._id)}
-            className="mt-2 bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-[var(--secondary)] transition-colors"
-          >
-            Ver detalles
-          </button>
+          {/* 👇 Mostrar botón solo si el usuario es admin o enfermeria */}
+          {puedeVerDetalles && (
+            <button
+              onClick={() => onVerDetalle(atencion._id)}
+              className="mt-2 bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-[var(--secondary)] transition-colors"
+            >
+              Ver detalles
+            </button>
+          )}
         </div>
       ))}
     </div>

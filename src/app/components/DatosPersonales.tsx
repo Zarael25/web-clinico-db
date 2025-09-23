@@ -19,11 +19,31 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
   const [alergias, setAlergias] = useState<{ alergia: string }[]>(condicionBase?.alergias || [])
   const [vacunas, setVacunas] = useState<{ vacuna: string }[]>(condicionBase?.vacunas || [])
 
+  const [rolesUsuario, setRolesUsuario] = useState<string[]>([])
+
+  // 🔎 Leer roles del usuario desde localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const usuarioStr = localStorage.getItem('usuario')
+      if (usuarioStr) {
+        try {
+          const usuario = JSON.parse(usuarioStr)
+          setRolesUsuario(usuario.roles || [])
+        } catch (err) {
+          console.error('Error parseando usuario desde localStorage:', err)
+        }
+      }
+    }
+  }, [])
+
   useEffect(() => {
     if (condicionBase?.condicion) setCondicion(condicionBase.condicion)
     if (condicionBase?.alergias) setAlergias(condicionBase.alergias)
     if (condicionBase?.vacunas) setVacunas(condicionBase.vacunas)
   }, [condicionBase])
+
+  // ✅ Solo admin o enfermeria pueden editar
+  const puedeEditar = rolesUsuario.includes('admin') || rolesUsuario.includes('enfermeria')
 
   return (
     <div className="space-y-6">
@@ -42,12 +62,8 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
                 <h4 className="text-md font-semibold text-[var(--primary)] mb-2">
                   {tutor.nombre} {tutor.apellido}
                 </h4>
-                <p className="text-sm">
-                  <strong>Parentesco:</strong> {tutor.parentesco}
-                </p>
-                <p className="text-sm">
-                  <strong>Celular:</strong> {tutor.celular || '—'}
-                </p>
+                <p className="text-sm"><strong>Parentesco:</strong> {tutor.parentesco}</p>
+                <p className="text-sm"><strong>Celular:</strong> {tutor.celular || '—'}</p>
               </div>
             ))}
           </div>
@@ -60,13 +76,15 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
       <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-sm p-5">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-subtitulo text-[var(--foreground)]">Condición base</h3>
-          <button
-            onClick={() => setIsCondicionModalOpen(true)}
-            className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
-                       hover:bg-[var(--secondary)] transition-colors ml-2"
-          >
-            Editar
-          </button>
+          {puedeEditar && (
+            <button
+              onClick={() => setIsCondicionModalOpen(true)}
+              className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
+                         hover:bg-[var(--secondary)] transition-colors ml-2"
+            >
+              Editar
+            </button>
+          )}
         </div>
 
         {condicion ? (
@@ -92,13 +110,15 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
       <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-sm p-5">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-subtitulo text-[var(--foreground)]">Alergias</h3>
-          <button
-            onClick={() => setIsAlergiasModalOpen(true)}
-            className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
-                       hover:bg-[var(--secondary)] transition-colors ml-2"
-          >
-            Editar
-          </button>
+          {puedeEditar && (
+            <button
+              onClick={() => setIsAlergiasModalOpen(true)}
+              className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
+                         hover:bg-[var(--secondary)] transition-colors ml-2"
+            >
+              Editar
+            </button>
+          )}
         </div>
 
         {alergias?.length > 0 ? (
@@ -130,13 +150,15 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
       <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-sm p-5">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-subtitulo text-[var(--foreground)]">Vacunas</h3>
-          <button
-            onClick={() => setIsVacunasModalOpen(true)}
-            className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
-                       hover:bg-[var(--secondary)] transition-colors ml-2"
-          >
-            Editar
-          </button>
+          {puedeEditar && (
+            <button
+              onClick={() => setIsVacunasModalOpen(true)}
+              className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
+                         hover:bg-[var(--secondary)] transition-colors ml-2"
+            >
+              Editar
+            </button>
+          )}
         </div>
 
         {vacunas?.length > 0 ? (
