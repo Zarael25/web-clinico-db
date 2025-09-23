@@ -3,7 +3,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-export default function NavTabs() {
+type NavTabsProps = {
+  children?: React.ReactNode
+}
+
+export default function NavTabs({ children }: NavTabsProps) {
   const pathname = usePathname()
 
   // Función para aplicar estilos activos
@@ -15,16 +19,22 @@ export default function NavTabs() {
     }`
 
   return (
-    <nav className="flex gap-4 border-b border-[var(--border)] bg-[var(--background)] px-6">
-      <Link href="/estudiantes" className={linkClasses('/estudiantes')}>
-        Estudiantes
-      </Link>
-      <Link
-        href="/clinico-calendario"
-        className={linkClasses('/clinico-calendario')}
-      >
-        Calendario
-      </Link>
+    <nav className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--background)] px-6">
+      {/* Tabs a la izquierda */}
+      <div className="flex gap-4">
+        <Link href="/estudiantes" className={linkClasses('/estudiantes')}>
+          Estudiantes
+        </Link>
+        <Link
+          href="/clinico-calendario"
+          className={linkClasses('/clinico-calendario')}
+        >
+          Calendario
+        </Link>
+      </div>
+
+      {/* 👉 Controles extra (reporte) a la derecha */}
+      <div className="flex items-center gap-2">{children}</div>
     </nav>
   )
 }

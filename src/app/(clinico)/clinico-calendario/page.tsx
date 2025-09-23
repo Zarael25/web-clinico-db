@@ -35,12 +35,19 @@ type Atencion = {
 }
 
 function getHoyISO() {
-  const hoy = new Date()
-  const yyyy = hoy.getFullYear()
-  const mm = String(hoy.getMonth() + 1).padStart(2, '0')
-  const dd = String(hoy.getDate()).padStart(2, '0')
-  return `${yyyy}-${mm}-${dd}`
+  return new Date().toLocaleDateString('en-CA', {
+    timeZone: 'America/La_Paz',
+  })
 }
+
+
+function toBoliviaDateString(fechaISO: string) {
+  return new Date(fechaISO).toLocaleDateString('en-CA', {
+    timeZone: 'America/La_Paz',
+  }) // 👉 "YYYY-MM-DD"
+}
+
+
 
 export default function ClinicoCalendarioPage() {
   // 📅 Estados para el calendario
@@ -48,16 +55,20 @@ export default function ClinicoCalendarioPage() {
   const [mesCal, setMesCal] = useState(new Date().getMonth())
   const [anioCal, setAnioCal] = useState(new Date().getFullYear())
 
-  // 📊 Estados para el reporte (independientes)
-  const [anioReporte, setAnioReporte] = useState(new Date().getFullYear())
-  const [mesReporte, setMesReporte] = useState<number | undefined>(undefined)
-  const [diaReporte, setDiaReporte] = useState<number | undefined>(undefined)
-
   const [atenciones, setAtenciones] = useState<Atencion[]>([])
   const [loading, setLoading] = useState(false)
   const [atencionSeleccionada, setAtencionSeleccionada] = useState<string | null>(null)
 
   const [usuario, setUsuario] = useState<any>(null)
+  const [modoReporte, setModoReporte] = useState<'anio' | 'mes' | 'dia'>('anio')
+
+
+  const rolesReporte = ['admin', 'enfermeria', 'administracion']
+  const puedeDescargarReporte = usuario?.roles?.some((r: string) =>
+    rolesReporte.includes(r)
+  )
+
+
 
   const token =
     typeof document !== 'undefined'
@@ -93,9 +104,9 @@ export default function ClinicoCalendarioPage() {
     }
   }, [fechaSeleccionada, token])
 
-  const atencionesHoy = [...atenciones].sort(
-    (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
-  )
+  const atencionesHoy = atenciones
+    .filter((a) => toBoliviaDateString(a.fecha) === fechaSeleccionada)
+    .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
 
   // ✅ Solo estos roles pueden ver detalle
   const rolesPermitidos = ['admin', 'enfermeria']
@@ -125,15 +136,21 @@ export default function ClinicoCalendarioPage() {
     setFechaSeleccionada(`${anioCal}-${mesString}-${diaString}`)
   }
 
-  // 📑 función descargar reporte (usa estados separados)
+  // 📑 función descargar reporte (basada en calendario y modoReporte)
   const handleDescargarReporte = async () => {
     try {
-      const blob = await descargarReporteAtenciones(
-        token,
-        String(anioReporte),
-        mesReporte ? String(mesReporte) : undefined,
-        diaReporte ? String(diaReporte) : undefined
-      )
+      let anio = String(anioCal)
+      let mes: string | undefined
+      let dia: string | undefined
+
+      if (modoReporte === 'mes' || modoReporte === 'dia') {
+        mes = String(mesCal + 1) // 👈 mesCal es 0-based, sumamos 1
+      }
+      if (modoReporte === 'dia') {
+        dia = fechaSeleccionada.split('-')[2] // 👈 extraemos el día del string YYYY-MM-DD
+      }
+
+      const blob = await descargarReporteAtenciones(token, anio, mes, dia)
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
@@ -153,7 +170,47 @@ export default function ClinicoCalendarioPage() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <Header />
-      <NavTabs />
+      <NavTabs>
+        {puedeDescargarReporte && (
+          <>
+            {/* 👉 Select Año/Mes/Día */}
+            <select
+              value={modoReporte}
+              onChange={(e) => setModoReporte(e.target.value as 'anio' | 'mes' | 'dia')}
+              className="border rounded px-3 py-1.5 bg-[var(--background)] text-[var(--foreground)] text-sm"
+            >
+              <option value="anio">Año</option>
+              <option value="mes">Mes</option>
+              <option value="dia">Día</option>
+            </select>
+
+            {/* 👉 Texto dinámico */}
+            <span className="text-xs text-gray-500 hidden sm:inline">
+              {modoReporte === 'anio' && `Año: ${anioCal}`}
+              {modoReporte === 'mes' && `Mes: ${mesCal + 1} / ${anioCal}`}
+              {modoReporte === 'dia' && `Día: ${fechaSeleccionada}`}
+            </span>
+
+            {/* 👉 Botón de descarga */}
+            <button
+              onClick={handleDescargarReporte}
+              className="bg-[var(--primary)] text-white px-3 py-1.5 rounded text-sm hover:bg-[var(--secondary)] transition"
+            >
+              Descargar
+            </button>
+          </>
+        )}
+      </NavTabs>
+
+
+
+
+
+
+
+
+
+
       <main className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* ===== LISTA ATENCIONES ===== */}
@@ -180,12 +237,16 @@ export default function ClinicoCalendarioPage() {
                         ? `${a.estudiante.nombre} ${a.estudiante.appaterno}`
                         : 'Estudiante desconocido'}
                     </span>
-                    <span className="text-sm">
-                      {new Date(a.fecha).toLocaleTimeString([], {
+
+
+                    <span className="text-xs text-gray-500">
+                      {toBoliviaDateString(a.fecha)} {new Date(a.fecha).toLocaleTimeString('es-BO', {
+                        timeZone: 'America/La_Paz',
                         hour: '2-digit',
                         minute: '2-digit',
                       })}
                     </span>
+
                   </div>
                   <p className="text-sm text-gray-500">Motivo: {a.motivo_consulta}</p>
                   <p className="text-xs text-gray-400">Atendido por: {a.user?.nombre}</p>
@@ -246,55 +307,7 @@ export default function ClinicoCalendarioPage() {
         </div>
       </main>
 
-      {/* ===== FOOTER DE REPORTE (INDEPENDIENTE) ===== */}
-      <div className="p-6 border-t border-[var(--border)] bg-[var(--backgroundAlt)]">
-        <h3 className="text-lg font-semibold mb-2">Generar reporte PDF</h3>
-        <div className="flex flex-wrap gap-2 items-center">
-          {/* Año obligatorio */}
-          <input
-            type="number"
-            value={anioReporte}
-            onChange={(e) => setAnioReporte(Number(e.target.value))}
-            className="w-24 border rounded px-2 py-1"
-          />
-
-          {/* Mes como lista (con opción "Ninguno") */}
-          <select
-            value={mesReporte ?? ''}
-            onChange={(e) =>
-              setMesReporte(e.target.value ? Number(e.target.value) : undefined)
-            }
-            className="w-40 border rounded px-2 py-1 
-                      bg-[var(--background)] text-[var(--foreground)]"
-          >
-            <option value="">Ninguno</option>
-            {meses.map((m, i) => (
-              <option key={i} value={i + 1}>
-                {m}
-              </option>
-            ))}
-          </select>
-
-          {/* Día opcional */}
-          <input
-            type="number"
-            min={1}
-            max={31}
-            value={diaReporte ?? ''}
-            placeholder="Día (opcional)"
-            onChange={(e) => setDiaReporte(e.target.value ? Number(e.target.value) : undefined)}
-            className="w-28 border rounded px-2 py-1"
-          />
-
-          <button
-            onClick={handleDescargarReporte}
-            className="bg-[var(--primary)] text-white px-4 py-2 rounded hover:bg-[var(--secondary)]"
-          >
-            Descargar PDF
-          </button>
-        </div>
-      </div>
-
+    
       {/* ===== MODAL DETALLE ===== */}
       {atencionSeleccionada && puedeVerDetalles && ( // ⬅️ solo renderizar modal si tiene permiso
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
