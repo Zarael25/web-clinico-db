@@ -64,4 +64,13 @@ export const ENDPOINTS = {
     DETALLE: (id: string) => `${API_BASE_URL}/v1/medicamentos/${id}`,
   },
 
+
+  TUTORES: {
+    LIST: `${API_BASE_URL}/v1/tutores/`, // GET todos y POST nuevo
+    DETALLE: (id: string) => `${API_BASE_URL}/v1/tutores/${id}`, // GET uno
+    EDITAR: (id: string) => `${API_BASE_URL}/v1/tutores/${id}`,  // PATCH
+  },
+
+
+
 };
