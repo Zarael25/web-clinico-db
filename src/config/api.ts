@@ -60,7 +60,8 @@ export const ENDPOINTS = {
 
 
   MEDICAMENTOS: {
-    LIST: `${API_BASE_URL}/v1/medicamentos/`,
+    LIST: `${API_BASE_URL}/v1/medicamentos/`, // GET todos y POST nuevo
+    DETALLE: (id: string) => `${API_BASE_URL}/v1/medicamentos/${id}`,
   },
 
 };
