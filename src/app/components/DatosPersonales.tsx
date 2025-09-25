@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import EditarCondicionBaseModal from '@/app/components/EditarCondicionBaseModal'
 import EditarAlergiasModal from '@/app/components/EditarAlergiasModal'
 import EditarVacunasModal from '@/app/components/EditarVacunasModal'
+import EditarTutoresModal from '@/app/components/EditarTutoresModal'
+import { getTutoresConEstudiantes } from '@/services/tutores'
 
 type DatosPersonalesProps = {
   estudiante: any
@@ -14,11 +16,13 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
   const [isCondicionModalOpen, setIsCondicionModalOpen] = useState(false)
   const [isAlergiasModalOpen, setIsAlergiasModalOpen] = useState(false)
   const [isVacunasModalOpen, setIsVacunasModalOpen] = useState(false)
+  const [isTutoresModalOpen, setIsTutoresModalOpen] = useState(false)
 
   const [condicion, setCondicion] = useState(condicionBase?.condicion || '')
   const [alergias, setAlergias] = useState<{ alergia: string }[]>(condicionBase?.alergias || [])
   const [vacunas, setVacunas] = useState<{ vacuna: string }[]>(condicionBase?.vacunas || [])
 
+  const [tutoresExtra, setTutoresExtra] = useState<any[]>([])
   const [rolesUsuario, setRolesUsuario] = useState<string[]>([])
 
   // 🔎 Leer roles del usuario desde localStorage
@@ -42,8 +46,27 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
     if (condicionBase?.vacunas) setVacunas(condicionBase.vacunas)
   }, [condicionBase])
 
-  // ✅ Solo admin o enfermeria pueden editar
+  // ✅ Solo admin o enfermería pueden editar
   const puedeEditar = rolesUsuario.includes('admin') || rolesUsuario.includes('enfermeria')
+
+  // 📌 Cargar tutores desde colección Tutor.ts (los que tienen al estudiante asignado)
+  const fetchTutoresExtra = async () => {
+    try {
+      const data = await getTutoresConEstudiantes(token)
+      const filtrados = data.tutores.filter((t: any) =>
+        t.estudiantes.some((e: any) => e._id === estudiante._id)
+      )
+      setTutoresExtra(filtrados)
+    } catch (err) {
+      console.error('❌ Error al cargar tutores extra', err)
+    }
+  }
+
+  useEffect(() => {
+    if (estudiante?._id && token) {
+      fetchTutoresExtra()
+    }
+  }, [estudiante, token])
 
   return (
     <div className="space-y-6">
@@ -51,12 +74,39 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
 
       {/* Tutores */}
       <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow-sm p-5">
-        <h3 className="text-lg font-subtitulo text-[var(--foreground)] mb-4">Tutores</h3>
-        {estudiante?.tutores?.length > 0 ? (
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-subtitulo text-[var(--foreground)]">Tutores</h3>
+          {puedeEditar && (
+            <button
+              onClick={() => setIsTutoresModalOpen(true)}
+              className="bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-parrafo 
+                         hover:bg-[var(--secondary)] transition-colors ml-2"
+            >
+              Añadir Tutor
+            </button>
+          )}
+        </div>
+
+        {(estudiante?.tutores?.length > 0 || tutoresExtra.length > 0) ? (
           <div className="flex flex-wrap gap-3">
+            {/* Tutores embebidos en documento Estudiante */}
             {estudiante.tutores.map((tutor: any, idx: number) => (
               <div
-                key={idx}
+                key={`est-${idx}`}
+                className="p-4 border border-[var(--border)] rounded-lg shadow-sm bg-[var(--background)] min-w-[150px]"
+              >
+                <h4 className="text-md font-semibold text-[var(--primary)] mb-2">
+                  {tutor.nombre} {tutor.apellido}
+                </h4>
+                <p className="text-sm"><strong>Parentesco:</strong> {tutor.parentesco}</p>
+                <p className="text-sm"><strong>Celular:</strong> {tutor.celular || '—'}</p>
+              </div>
+            ))}
+
+            {/* Tutores asignados desde colección Tutor.ts */}
+            {tutoresExtra.map((tutor: any) => (
+              <div
+                key={`extra-${tutor._id}`}
                 className="p-4 border border-[var(--border)] rounded-lg shadow-sm bg-[var(--background)] min-w-[150px]"
               >
                 <h4 className="text-md font-semibold text-[var(--primary)] mb-2">
@@ -96,7 +146,6 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
         )}
       </div>
 
-      {/* Modal Condición */}
       <EditarCondicionBaseModal
         isOpen={isCondicionModalOpen}
         onClose={() => setIsCondicionModalOpen(false)}
@@ -137,7 +186,6 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
         )}
       </div>
 
-      {/* Modal Alergias */}
       <EditarAlergiasModal
         isOpen={isAlergiasModalOpen}
         onClose={() => setIsAlergiasModalOpen(false)}
@@ -177,13 +225,21 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
         )}
       </div>
 
-      {/* Modal Vacunas */}
       <EditarVacunasModal
         isOpen={isVacunasModalOpen}
         onClose={() => setIsVacunasModalOpen(false)}
         estudianteId={estudiante._id}
         token={token}
         onUpdated={(nuevasVacunas) => setVacunas(nuevasVacunas)}
+      />
+
+      {/* Modal Tutores */}
+      <EditarTutoresModal
+        isOpen={isTutoresModalOpen}
+        onClose={() => setIsTutoresModalOpen(false)}
+        estudianteId={estudiante._id}
+        token={token}
+        onUpdated={fetchTutoresExtra}
       />
     </div>
   )

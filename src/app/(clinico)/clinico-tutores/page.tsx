@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import Header from '@/app/components/Header'
 import NavTabs from '@/app/components/NavTabs'
-import { getTutores, createTutor } from '@/services/tutores'
+import { getTutoresConEstudiantes, createTutor, updateTutor } from '@/services/tutores'
+
 
 type Estudiante = {
   _id: string
@@ -30,7 +31,7 @@ export default function TutoresPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // modal
+  // Modal de crear
   const [showModal, setShowModal] = useState(false)
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
@@ -39,6 +40,10 @@ export default function TutoresPage() {
   const [parentesco, setParentesco] = useState('')
   const [celular, setCelular] = useState('')
   const [saving, setSaving] = useState(false)
+
+  // Modal de editar
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedTutor, setSelectedTutor] = useState<Tutor | null>(null)
 
   // 🔑 token
   const token =
@@ -50,7 +55,7 @@ export default function TutoresPage() {
     try {
       setLoading(true)
       setError(null)
-      const data = await getTutores(token)
+      const data = await getTutoresConEstudiantes(token) // 👈 usar este
       setTutores(data.tutores)
     } catch (err: any) {
       setError(err.message || 'Error desconocido')
@@ -91,6 +96,34 @@ export default function TutoresPage() {
       fetchData()
     } catch (err) {
       console.error('❌ Error al crear tutor', err)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // ✅ editar tutor
+  const handleEdit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedTutor) return
+    try {
+      setSaving(true)
+      await updateTutor(
+        selectedTutor._id,
+        {
+          nombre: selectedTutor.nombre,
+          apellido: selectedTutor.apellido,
+          carnet: selectedTutor.carnet,
+          lugarTrabajo: selectedTutor.lugarTrabajo,
+          parentesco: selectedTutor.parentesco,
+          celular: selectedTutor.celular,
+          estudiantes: selectedTutor.estudiantes.map((e) => e._id),
+        },
+        token
+      )
+      setShowEditModal(false)
+      fetchData()
+    } catch (err) {
+      console.error('❌ Error al actualizar tutor', err)
     } finally {
       setSaving(false)
     }
@@ -158,7 +191,10 @@ export default function TutoresPage() {
                     <td className="p-2">
                       <button
                         className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded-lg"
-                        onClick={() => alert(`Editar tutor ${t._id}`)}
+                        onClick={() => {
+                          setSelectedTutor(t)
+                          setShowEditModal(true)
+                        }}
                       >
                         Editar
                       </button>
@@ -254,6 +290,104 @@ export default function TutoresPage() {
                   className="px-4 py-2 rounded-lg bg-[var(--primary)] text-white hover:bg-[var(--secondary)] disabled:opacity-50"
                 >
                   {saving ? 'Guardando...' : 'Guardar'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 🔹 Modal para editar tutor */}
+      {showEditModal && selectedTutor && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="bg-[var(--background)] text-[var(--foreground)] p-6 rounded-xl shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-titulo mb-4">Editar Tutor</h2>
+            <form onSubmit={handleEdit} className="space-y-4">
+              <div>
+                <label className="block text-sm mb-1">Nombre</label>
+                <input
+                  type="text"
+                  value={selectedTutor.nombre}
+                  onChange={(e) =>
+                    setSelectedTutor({ ...selectedTutor, nombre: e.target.value })
+                  }
+                  className="w-full border border-[var(--border)] rounded-lg px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">Apellido</label>
+                <input
+                  type="text"
+                  value={selectedTutor.apellido}
+                  onChange={(e) =>
+                    setSelectedTutor({ ...selectedTutor, apellido: e.target.value })
+                  }
+                  className="w-full border border-[var(--border)] rounded-lg px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">Carnet</label>
+                <input
+                  type="text"
+                  value={selectedTutor.carnet}
+                  onChange={(e) =>
+                    setSelectedTutor({ ...selectedTutor, carnet: e.target.value })
+                  }
+                  className="w-full border border-[var(--border)] rounded-lg px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">Parentesco</label>
+                <input
+                  type="text"
+                  value={selectedTutor.parentesco}
+                  onChange={(e) =>
+                    setSelectedTutor({ ...selectedTutor, parentesco: e.target.value })
+                  }
+                  className="w-full border border-[var(--border)] rounded-lg px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">Celular</label>
+                <input
+                  type="text"
+                  value={selectedTutor.celular}
+                  onChange={(e) =>
+                    setSelectedTutor({ ...selectedTutor, celular: e.target.value })
+                  }
+                  className="w-full border border-[var(--border)] rounded-lg px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">Lugar de trabajo</label>
+                <input
+                  type="text"
+                  value={selectedTutor.lugarTrabajo || ''}
+                  onChange={(e) =>
+                    setSelectedTutor({ ...selectedTutor, lugarTrabajo: e.target.value })
+                  }
+                  className="w-full border border-[var(--border)] rounded-lg px-3 py-2"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-gray-100"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-4 py-2 rounded-lg bg-[var(--primary)] text-white hover:bg-[var(--secondary)] disabled:opacity-50"
+                >
+                  {saving ? 'Guardando...' : 'Guardar cambios'}
                 </button>
               </div>
             </form>

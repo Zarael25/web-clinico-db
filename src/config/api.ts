@@ -67,8 +67,13 @@ export const ENDPOINTS = {
 
   TUTORES: {
     LIST: `${API_BASE_URL}/v1/tutores/`, // GET todos y POST nuevo
+    CON_ESTUDIANTES: `${API_BASE_URL}/v1/tutores/con-estudiantes`, // GET todos con estudiantes
     DETALLE: (id: string) => `${API_BASE_URL}/v1/tutores/${id}`, // GET uno
-    EDITAR: (id: string) => `${API_BASE_URL}/v1/tutores/${id}`,  // PATCH
+    EDITAR: (id: string) => `${API_BASE_URL}/v1/tutores/${id}`, // PATCH
+    ADD_ESTUDIANTE: (id: string) =>
+      `${API_BASE_URL}/v1/tutores/${id}/add-estudiante`, // POST { estudianteId }
+    REMOVE_ESTUDIANTE: (id: string, estudianteId: string) =>
+      `${API_BASE_URL}/v1/tutores/${id}/remove-estudiante/${estudianteId}`, // DELETE
   },
 
 
