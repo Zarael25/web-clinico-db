@@ -211,10 +211,10 @@ export default function ClinicoCalendarioPage() {
 
 
 
-      <main className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <main className="p-6 grid grid-cols-1 lg:grid-cols-5 gap-6">
         
         {/* ===== LISTA ATENCIONES ===== */}
-        <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow p-4">
+        <div className="lg:col-span-3 bg-[var(--background)] border border-[var(--border)] rounded-xl shadow p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-titulo">Atenciones</h2>
             <span className="font-subtitulo">{fechaSeleccionada}</span>
@@ -259,7 +259,7 @@ export default function ClinicoCalendarioPage() {
         </div>
 
         {/* ===== CALENDARIO ===== */}
-        <div className="bg-[var(--background)] border border-[var(--border)] rounded-xl shadow p-4">
+        <div className="lg:col-span-2 bg-[var(--background)] border border-[var(--border)] rounded-xl shadow p-4">
           <div className="flex justify-center gap-4 mb-4">
             <select
               value={mesCal}

@@ -45,25 +45,31 @@ export default function ClinicoHistorialPage() {
 
   useEffect(() => {
     if (estudianteId && token) {
+      // 🔹 Siempre refrescamos el estudiante
       getEstudianteById(estudianteId, token)
         .then((data) => setEstudiante(data))
         .catch((err) => console.error('Error cargando estudiante:', err))
 
-      getCondicionBaseByEstudiante(estudianteId, token)
-        .then((data) => setCondicionBase(data))
-        .catch((err) => console.error('Error cargando condición base:', err))
+      // 🔹 Si estamos en "datos" o "nueva" refrescamos condicion base
+      if (seccionActiva === 'datos' || seccionActiva === 'nueva') {
+        getCondicionBaseByEstudiante(estudianteId, token)
+          .then((data) => setCondicionBase(data))
+          .catch((err) => console.error('Error cargando condición base:', err))
+      }
 
-      getAtencionesByEstudiante(estudianteId, token)
-        .then((data) => {
-          // Ordenar de más reciente a más antigua
-          const ordenadas = [...data].sort(
-            (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-          )
-          setAtenciones(ordenadas)
-        })
-        .catch((err) => console.error('Error cargando atenciones:', err))
+      // 🔹 Si estamos en "historial" refrescamos atenciones
+      if (seccionActiva === 'historial') {
+        getAtencionesByEstudiante(estudianteId, token)
+          .then((data) => {
+            const ordenadas = [...data].sort(
+              (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+            )
+            setAtenciones(ordenadas)
+          })
+          .catch((err) => console.error('Error cargando atenciones:', err))
+      }
     }
-  }, [estudianteId, token])
+  }, [estudianteId, token, seccionActiva])
 
   const convertirFecha = (fechaISO: string) => {
     const fecha = new Date(fechaISO)
