@@ -64,7 +64,6 @@ export default function ClinicoHistorialPage() {
       : ''
 
   useEffect(() => {
-    // Leer usuario desde localStorage
     if (typeof window !== 'undefined') {
       const usuarioStr = localStorage.getItem('usuario')
       if (usuarioStr) {
@@ -92,17 +91,15 @@ export default function ClinicoHistorialPage() {
           .catch((err) => console.error('Error cargando condición base:', err))
       }
 
+      getAtencionesByEstudiante(estudianteId, token)
+        .then((data) => {
+          const ordenadas = [...data].sort(
+            (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+          )
+          setAtenciones(ordenadas)
+        })
+        .catch((err) => console.error('Error cargando atenciones:', err))
       
-      if (seccionActiva === 'historial') {
-        getAtencionesByEstudiante(estudianteId, token)
-          .then((data) => {
-            const ordenadas = [...data].sort(
-              (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
-            )
-            setAtenciones(ordenadas)
-          })
-          .catch((err) => console.error('Error cargando atenciones:', err))
-      }
     }
   }, [estudianteId, token, seccionActiva])
 
