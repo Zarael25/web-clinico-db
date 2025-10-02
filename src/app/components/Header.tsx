@@ -1,3 +1,31 @@
+/**
+ * Descripción:
+ *   Componente de cabecera principal de la aplicación **Don Bosco Clínico**.
+ *   Muestra el título, el nombre del usuario autenticado, el botón para cerrar sesión
+ *   y el control de cambio de tema (`ThemeToggle`).
+ *
+ * Flujo:
+ *   1. Obtiene el token desde las cookies (`document.cookie`).
+ *   2. Si existe el token:
+ *       - Llama a `getMe(token)` para validar la sesión y obtener los datos del usuario.
+ *       - Si la respuesta es válida → muestra el nombre completo del usuario.
+ *       - Si falla → ejecuta `handleLogout()` (borra la cookie y redirige al login).
+ *   3. Si no existe el token → también redirige al login con `handleLogout()`.
+ *   4. El botón "Cerrar Sesión" elimina el token de las cookies y envía al login.
+ *
+ * Props:
+ *   - (ninguna) → Es un componente global de cabecera, se renderiza en las páginas principales.
+ *
+ * Características:
+ *   - Usa `useEffect` para validar la sesión al montar el componente.
+ *   - Usa `useState` para manejar el nombre del usuario (`nombreUsuario`).
+ *   - Estilos consistentes con Tailwind CSS y variables CSS personalizadas (`--primary`, `--foreground`, etc.).
+ *   - Incluye `ThemeToggle` para cambiar entre modo claro/oscuro.
+ *
+ */
+
+
+
 'use client'
 
 import { useRouter } from 'next/navigation'
@@ -10,7 +38,7 @@ export default function Header() {
   const [nombreUsuario, setNombreUsuario] = useState<string>('')
 
   useEffect(() => {
-    // Leer token de cookie
+    
     const token = document.cookie
       .split('; ')
       .find((c) => c.startsWith('token='))
@@ -25,7 +53,7 @@ export default function Header() {
           }
         })
         .catch(() => {
-          // Si el token no sirve, cerramos sesión automáticamente
+          
           handleLogout()
         })
     } else {
@@ -34,10 +62,10 @@ export default function Header() {
   }, [])
 
   const handleLogout = () => {
-    // Borrar cookie del token
+    
     document.cookie = 'token=; path=/; max-age=0'
 
-    // Redirigir a login
+    
     router.push('/auth/login')
   }
 

@@ -1,3 +1,41 @@
+/**
+ * Descripción:
+ *   Componente que prepara la creación de una nueva atención médica para un estudiante.
+ *   Muestra los datos clínicos base (condición, alergias, vacunas) y un botón
+ *   que permite iniciar el registro de la nueva atención.
+ *
+ * Props:
+ *   - condicion (string, opcional): Condición base del estudiante.
+ *   - alergias (array, opcional): Lista de alergias asociadas, puede venir como array de strings
+ *     o de objetos con la propiedad `alergia`.
+ *   - vacunas (array, opcional): Lista de vacunas registradas, puede venir como array de strings
+ *     o de objetos con la propiedad `vacuna`.
+ *   - onAgregarClick (function): Callback que se ejecuta al presionar el botón
+ *     "Agregar Nueva Atención".
+ *
+ * Flujo:
+ *   1. Muestra un título "Nueva Atención".
+ *   2. Reutiliza el componente `CondicionBaseDetalle` para visualizar la condición base,
+ *      alergias y vacunas del estudiante.
+ *   3. Renderiza un botón "Agregar Nueva Atención".
+ *   4. Cuando se hace clic en el botón, se ejecuta `onAgregarClick`, que normalmente
+ *      redirige o cambia el estado del padre para abrir el formulario de registro.
+ *
+ * Características:
+ *   - Usa `CondicionBaseDetalle` para mantener consistencia visual.
+ *   - Interfaz simple y clara con estilos consistentes en tarjetas (`border`, `rounded-xl`, `shadow-sm`).
+ *   - Botón de acción con transición de colores y estados hover.
+ *
+ * Uso:
+ *   <NuevaAtencion
+ *     condicion="Asma"
+ *     alergias={[{ alergia: "Polen" }, { alergia: "Maní" }]}
+ *     vacunas={[{ vacuna: "COVID-19" }]}
+ *     onAgregarClick={() => setSeccionActiva('agregar')}
+ *   />
+ */
+
+
 'use client'
 
 import CondicionBaseDetalle from './CondicionBaseDetalle'

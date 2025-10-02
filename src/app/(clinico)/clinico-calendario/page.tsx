@@ -1,3 +1,34 @@
+/**
+ * Descripción:
+ *   Página principal del calendario clínico del sistema "Don Bosco Clínico".
+ *   Permite visualizar atenciones médicas organizadas por fecha,
+ *   consultar el detalle de cada atención y descargar reportes en PDF.
+ *
+ * Características:
+ *   - Muestra la lista de atenciones de la fecha seleccionada, con estudiante y médico responsable.
+ *   - Incluye un calendario interactivo para navegar entre días, meses y años.
+ *   - Permite abrir un modal con el detalle completo de cada atención (según rol).
+ *   - Descarga reportes PDF filtrados por año, mes o día (solo roles autorizados).
+ *   - Obtiene token JWT desde cookies y datos de usuario desde localStorage.
+ *   - Usa servicios de la API (`getAtencionesByFecha`, `descargarReporteAtenciones`).
+ *
+ * Roles y permisos:
+ *   - Ver detalles de atenciones → ['admin', 'enfermeria']
+ *   - Descargar reportes PDF → ['admin', 'enfermeria', 'administracion']
+ *
+ * Uso:
+ *   - Se carga automáticamente la fecha de hoy al ingresar.
+ *   - El usuario puede seleccionar otra fecha desde el calendario.
+ *   - Si tiene permisos, puede descargar el reporte en PDF.
+ *   - Si tiene permisos, puede abrir un modal para ver detalles de la atención.
+ *
+ * Componentes relacionados:
+ *   - Header: Encabezado con título y logout.
+ *   - NavTabs: Navegación entre pestañas (Estudiantes / Calendario).
+ *   - DetalleAtencion: Modal que muestra información completa de una atención.
+ */
+
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -44,13 +75,13 @@ function getHoyISO() {
 function toBoliviaDateString(fechaISO: string) {
   return new Date(fechaISO).toLocaleDateString('en-CA', {
     timeZone: 'America/La_Paz',
-  }) // 👉 "YYYY-MM-DD"
+  }) 
 }
 
 
 
 export default function ClinicoCalendarioPage() {
-  // 📅 Estados para el calendario
+  
   const [fechaSeleccionada, setFechaSeleccionada] = useState(getHoyISO())
   const [mesCal, setMesCal] = useState(new Date().getMonth())
   const [anioCal, setAnioCal] = useState(new Date().getFullYear())
@@ -75,7 +106,7 @@ export default function ClinicoCalendarioPage() {
       ? document.cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1] || ''
       : ''
 
-  // 🔑 Recuperar usuario de localStorage
+  
   useEffect(() => {
     const storedUser = localStorage.getItem('usuario')
     if (storedUser) {
@@ -84,7 +115,7 @@ export default function ClinicoCalendarioPage() {
   }, [])
 
 
-  // Cargar atenciones por fecha seleccionada (solo calendario)
+  
   useEffect(() => {
     const fetchAtenciones = async () => {
       setLoading(true)
@@ -108,7 +139,7 @@ export default function ClinicoCalendarioPage() {
     .filter((a) => toBoliviaDateString(a.fecha) === fechaSeleccionada)
     .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
 
-  // ✅ Solo estos roles pueden ver detalle
+  
   const rolesPermitidos = ['admin', 'enfermeria']
   const puedeVerDetalles = usuario?.roles?.some((r: string) => rolesPermitidos.includes(r)) // ⬅️ verificación
 
@@ -118,7 +149,7 @@ export default function ClinicoCalendarioPage() {
     }
   }
   
-  // 📆 lógica calendario
+  
   const diasEnMes = new Date(anioCal, mesCal + 1, 0).getDate()
   const primerDiaSemana = new Date(anioCal, mesCal, 1).getDay()
   const dias: (number | null)[] = []
@@ -136,7 +167,7 @@ export default function ClinicoCalendarioPage() {
     setFechaSeleccionada(`${anioCal}-${mesString}-${diaString}`)
   }
 
-  // 📑 función descargar reporte (basada en calendario y modoReporte)
+  
   const handleDescargarReporte = async () => {
     try {
       let anio = String(anioCal)
@@ -144,10 +175,10 @@ export default function ClinicoCalendarioPage() {
       let dia: string | undefined
 
       if (modoReporte === 'mes' || modoReporte === 'dia') {
-        mes = String(mesCal + 1) // 👈 mesCal es 0-based, sumamos 1
+        mes = String(mesCal + 1) 
       }
       if (modoReporte === 'dia') {
-        dia = fechaSeleccionada.split('-')[2] // 👈 extraemos el día del string YYYY-MM-DD
+        dia = fechaSeleccionada.split('-')[2] 
       }
 
       const blob = await descargarReporteAtenciones(token, anio, mes, dia)
@@ -173,7 +204,7 @@ export default function ClinicoCalendarioPage() {
       <NavTabs>
         {puedeDescargarReporte && (
           <>
-            {/* 👉 Select Año/Mes/Día */}
+            {/* Select Año/Mes/Día */}
             <select
               value={modoReporte}
               onChange={(e) => setModoReporte(e.target.value as 'anio' | 'mes' | 'dia')}
@@ -184,14 +215,14 @@ export default function ClinicoCalendarioPage() {
               <option value="dia">Día</option>
             </select>
 
-            {/* 👉 Texto dinámico */}
+            {/* Texto dinámico */}
             <span className="text-xs text-gray-500 hidden sm:inline">
               {modoReporte === 'anio' && `Año: ${anioCal}`}
               {modoReporte === 'mes' && `Mes: ${mesCal + 1} / ${anioCal}`}
               {modoReporte === 'dia' && `Día: ${fechaSeleccionada}`}
             </span>
 
-            {/* 👉 Botón de descarga */}
+            {/* Botón de descarga */}
             <button
               onClick={handleDescargarReporte}
               className="bg-[var(--primary)] text-white px-3 py-1.5 rounded text-sm hover:bg-[var(--secondary)] transition"
@@ -201,13 +232,6 @@ export default function ClinicoCalendarioPage() {
           </>
         )}
       </NavTabs>
-
-
-
-
-
-
-
 
 
 
@@ -309,7 +333,7 @@ export default function ClinicoCalendarioPage() {
 
     
       {/* ===== MODAL DETALLE ===== */}
-      {atencionSeleccionada && puedeVerDetalles && ( // ⬅️ solo renderizar modal si tiene permiso
+      {atencionSeleccionada && puedeVerDetalles && ( 
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
           <div className="bg-[var(--background)] text-[var(--foreground)] p-6 rounded-lg max-w-lg w-full shadow-lg overflow-y-auto max-h-[90vh]">
             <DetalleAtencion

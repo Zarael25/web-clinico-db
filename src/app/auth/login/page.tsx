@@ -1,3 +1,42 @@
+/**
+ * Descripción:
+ *   Página de inicio de sesión para el sistema "Don Bosco Clínico".
+ *   Permite a los usuarios autenticarse con su Carnet de Identidad y contraseña.
+ *
+ * Características:
+ *   - Formulario con validación básica (usuario y contraseña obligatorios).
+ *   - Autenticación:
+ *       • Envía credenciales al backend mediante `loginUsuario`.
+ *       • Maneja respuesta con token JWT y datos del usuario.
+ *   - Manejo de estado:
+ *       • username, password → inputs del formulario.
+ *       • error → mensaje de error en caso de credenciales inválidas u otro fallo.
+ *       • mensaje → mensaje de éxito devuelto por el backend.
+ *   - Persistencia de sesión:
+ *       • Token se guarda en cookie (`token`) con expiración de 1 hora.
+ *       • Usuario autenticado se guarda en `localStorage` (`usuario`).
+ *   - Redirección automática:
+ *       • Si el login es exitoso, se redirige a la página `/estudiantes`.
+ *   - Estilo:
+ *       • Uso de variables CSS (`var(--primary)`, `var(--secondary)`, etc.).
+ *       • Efectos de hover y sombras para resaltar el formulario.
+ *       • Soporte de cambio de tema con `ThemeToggle`.
+ *
+ * Roles y permisos:
+ *   - Solo usuarios con credenciales válidas acceden al sistema.
+ *   - Backend valida usuario, contraseña y genera token con roles/niveles.
+ *
+ * Uso:
+ *   - Ingresar carnet y contraseña.
+ *   - Enviar formulario → genera cookie y localStorage → redirige a `/estudiantes`.
+ *
+ * Componentes relacionados:
+ *   - ThemeToggle: botón de cambio de tema claro/oscuro.
+ *   - Servicios:
+ *       • loginUsuario(username, password) → autentica usuario en backend.
+ */
+
+
 'use client'
 
 import { useState } from 'react'
@@ -26,7 +65,7 @@ export default function LoginPage() {
       const expires = new Date(Date.now() + 60 * 60 * 1000).toUTCString() // 1 hora
       document.cookie = `token=${data.token}; path=/; max-age=3600; samesite=lax`;
 
-      // ✅ Guardar usuario en localStorage
+      // Guardar usuario en localStorage
       localStorage.setItem('usuario', JSON.stringify(data.usuario))
 
       // Redirigir a estudiantes
@@ -60,7 +99,7 @@ export default function LoginPage() {
           className="block mb-2 font-subtitulo text-[var(--foreground)]"
           htmlFor="username"
         >
-          Usuario
+          Carnet de Identidad
         </label>
         <input
           id="username"
@@ -68,7 +107,7 @@ export default function LoginPage() {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="w-full mb-4 p-3 border border-[var(--border)] rounded-xl bg-[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] font-parrafo placeholder-gray-400"
-          placeholder="Ingresa tu usuario"
+          placeholder="Ingresa tu C.I."
           required
         />
 

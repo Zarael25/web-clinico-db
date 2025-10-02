@@ -1,3 +1,40 @@
+/**
+ * Descripción:
+ *   Página de gestión de medicamentos en el sistema "Don Bosco Clínico".
+ *   Permite listar los medicamentos registrados y crear nuevos desde un modal.
+ *
+ * Características:
+ *   - Obtiene la lista de medicamentos desde el backend mediante token JWT.
+ *   - Presenta los datos en una tabla responsiva:
+ *       • Nombre Comercial
+ *       • Nombre Genérico
+ *       • Presentación
+ *       • Fecha de creación
+ *   - Incluye un modal con formulario para añadir nuevos medicamentos:
+ *       • Validación de campos obligatorios.
+ *       • Feedback visual de guardado/cancelación.
+ *   - Maneja estados locales:
+ *       • loading → muestra mensaje de carga.
+ *       • error → muestra error si falla la petición.
+ *       • saving → evita duplicar peticiones mientras guarda.
+ *
+ * Roles y permisos:
+ *   - Acceso restringido en backend a roles: ['admin', 'enfermeria'].
+ *   - Cualquier usuario autorizado puede visualizar los medicamentos listados.
+ *
+ * Uso:
+ *   - El botón "+ Añadir" abre el modal.
+ *   - Al confirmar el formulario se crea el medicamento y se refresca la lista.
+ *   - El modal puede cerrarse manualmente o tras guardar con éxito.
+ *
+ * Componentes relacionados:
+ *   - Header: Encabezado principal de la aplicación.
+ *   - NavTabs: Navegación superior entre secciones.
+ *   - Servicios:
+ *       • getMedicamentos(token) → listado desde API.
+ *       • createMedicamento(token, data) → creación en API.
+ */
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -18,14 +55,14 @@ export default function MedicamentosPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // modal
+  
   const [showModal, setShowModal] = useState(false)
   const [nombreComercial, setNombreComercial] = useState('')
   const [nombreGenerico, setNombreGenerico] = useState('')
   const [presentacion, setPresentacion] = useState('')
   const [saving, setSaving] = useState(false)
 
-  // 🔑 token
+  
   const token =
     typeof document !== 'undefined'
       ? document.cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1] || ''
@@ -48,7 +85,7 @@ export default function MedicamentosPage() {
     if (token) fetchData()
   }, [token])
 
-  // ✅ crear medicamento
+  
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
@@ -125,7 +162,7 @@ export default function MedicamentosPage() {
         )}
       </main>
 
-      {/* 🔹 Modal para añadir */}
+      {/* Modal para añadir */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <div className="bg-[var(--background)] text-[var(--foreground)] p-6 rounded-xl shadow-lg w-full max-w-md">

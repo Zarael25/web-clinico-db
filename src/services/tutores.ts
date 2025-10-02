@@ -1,6 +1,87 @@
+/**
+ * Descripción:
+ *   Servicios para la gestión de tutores en el sistema clínico.
+ *   Permiten listar, crear, actualizar y asignar tutores a estudiantes.
+ *
+ * Funciones:
+ *
+ *   getTutores(token):
+ *     - GET → /v1/tutores/
+ *     - Obtiene la lista de todos los tutores registrados (sin estudiantes asociados).
+ *     - Parámetros:
+ *         token (string): JWT de autenticación.
+ *     - Retorna un array de tutores.
+ *     - Ejemplo:
+ *         const lista = await getTutores(token)
+ *
+ *
+ *   getTutoresConEstudiantes(token):
+ *     - GET → /v1/tutores/con-estudiantes
+ *     - Obtiene la lista de tutores junto con los estudiantes asignados.
+ *     - Parámetros:
+ *         token (string): JWT de autenticación.
+ *     - Retorna un array de tutores con propiedad `estudiantes: []`.
+ *
+ *
+ *   getTutorById(id, token):
+ *     - GET → /v1/tutores/:id
+ *     - Obtiene los datos de un tutor específico, con su detalle y estudiantes.
+ *     - Parámetros:
+ *         id (string): ID único del tutor.
+ *         token (string): JWT de autenticación.
+ *     - Retorna un objeto tutor.
+ *
+ *
+ *   createTutor(tutorData, token):
+ *     - POST → /v1/tutores/
+ *     - Crea un nuevo tutor en la base de datos.
+ *     - Parámetros:
+ *         tutorData (object): Información del tutor (nombre, apellido, carnet, parentesco, celular, etc.).
+ *         token (string): JWT de autenticación.
+ *     - Retorna el tutor recién creado.
+ *
+ *
+ *   updateTutor(id, tutorData, token):
+ *     - PATCH → /v1/tutores/:id
+ *     - Actualiza parcialmente los datos de un tutor existente.
+ *     - Parámetros:
+ *         id (string): ID del tutor.
+ *         tutorData (object): Campos a actualizar.
+ *         token (string): JWT de autenticación.
+ *     - Retorna el tutor actualizado.
+ *
+ *
+ *   addEstudianteToTutor(tutorId, estudianteId, token):
+ *     - POST → /v1/tutores/:id/add-estudiante
+ *     - Asigna un estudiante a un tutor.
+ *     - Parámetros:
+ *         tutorId (string): ID del tutor.
+ *         estudianteId (string): ID del estudiante.
+ *         token (string): JWT de autenticación.
+ *     - Retorna el tutor actualizado con el nuevo estudiante agregado.
+ *
+ *
+ *   removeEstudianteFromTutor(tutorId, estudianteId, token):
+ *     - DELETE → /v1/tutores/:id/remove-estudiante/:estudianteId
+ *     - Elimina la relación entre un tutor y un estudiante.
+ *     - Parámetros:
+ *         tutorId (string): ID del tutor.
+ *         estudianteId (string): ID del estudiante a remover.
+ *         token (string): JWT de autenticación.
+ *     - Retorna el tutor actualizado sin el estudiante.
+ *
+ * Características:
+ *   - Todas las funciones requieren un `token` válido (Bearer).
+ *   - Manejo de errores con `throw new Error` en respuestas no `ok`.
+ *   - Compatible con los componentes React/Next.js que consumen el backend.
+ *
+ */
+
+
+
 import { ENDPOINTS } from '@/config/api'
 
-// 📌 Listar todos los tutores
+
 export async function getTutores(token: string) {
   const response = await fetch(ENDPOINTS.TUTORES.LIST, {
     headers: {
@@ -16,7 +97,7 @@ export async function getTutores(token: string) {
   return response.json()
 }
 
-// 📌 Listar tutores con estudiantes (join manual)
+
 export async function getTutoresConEstudiantes(token: string) {
   const response = await fetch(ENDPOINTS.TUTORES.CON_ESTUDIANTES, {
     headers: {
@@ -32,7 +113,7 @@ export async function getTutoresConEstudiantes(token: string) {
   return response.json()
 }
 
-// 📌 Obtener tutor por ID
+
 export async function getTutorById(id: string, token: string) {
   const response = await fetch(ENDPOINTS.TUTORES.DETALLE(id), {
     headers: {
@@ -48,7 +129,7 @@ export async function getTutorById(id: string, token: string) {
   return response.json()
 }
 
-// 📌 Crear tutor
+
 export async function createTutor(tutorData: any, token: string) {
   const response = await fetch(ENDPOINTS.TUTORES.LIST, {
     method: 'POST',
@@ -66,7 +147,7 @@ export async function createTutor(tutorData: any, token: string) {
   return response.json()
 }
 
-// 📌 Editar tutor
+
 export async function updateTutor(id: string, tutorData: any, token: string) {
   const response = await fetch(ENDPOINTS.TUTORES.EDITAR(id), {
     method: 'PATCH',
@@ -84,7 +165,7 @@ export async function updateTutor(id: string, tutorData: any, token: string) {
   return response.json()
 }
 
-// 📌 Agregar estudiante a tutor
+
 export async function addEstudianteToTutor(tutorId: string, estudianteId: string, token: string) {
   const response = await fetch(ENDPOINTS.TUTORES.ADD_ESTUDIANTE(tutorId), {
     method: 'POST',
@@ -102,7 +183,7 @@ export async function addEstudianteToTutor(tutorId: string, estudianteId: string
   return response.json()
 }
 
-// 📌 Remover estudiante de tutor
+
 export async function removeEstudianteFromTutor(
   tutorId: string,
   estudianteId: string,

@@ -1,3 +1,44 @@
+/**
+ * Descripción:
+ *   Componente que muestra el historial clínico de un estudiante.
+ *   Lista todas las atenciones médicas registradas, con información básica 
+ *   (motivo, diagnóstico, tratamiento y sugerencia de baja).
+ *   Si el usuario tiene rol adecuado, permite abrir el detalle completo de cada atención.
+ *
+ * Props:
+ *   - estudianteId (string): ID del estudiante al que pertenecen las atenciones.
+ *   - token (string): Token JWT de autenticación.
+ *   - onVerDetalle (function): Callback que recibe el ID de una atención seleccionada 
+ *                              para mostrar su detalle en el componente padre.
+ *
+ * Flujo:
+ *   1. Al montar, obtiene el usuario desde `localStorage` para validar roles.
+ *   2. Llama a `getAtencionesByEstudiante(estudianteId, token)` para traer 
+ *      todas las atenciones del estudiante.
+ *   3. Muestra estado de carga mientras se obtiene la información.
+ *   4. Si no hay atenciones registradas → muestra mensaje "No hay atenciones registradas".
+ *   5. Renderiza cada atención en una tarjeta con:
+ *        - Motivo de consulta
+ *        - Diagnóstico
+ *        - Tratamiento
+ *        - Indicador de sugerencia de baja
+ *   6. Si el usuario tiene rol `admin` o `enfermeria` → muestra el botón "Ver detalles".
+ *      Al hacer clic se ejecuta `onVerDetalle(atencion._id)`.
+ *
+ * Características:
+ *   - Control de permisos mediante roles.
+ *   - Fechas convertidas a formato local de Bolivia (`es-BO`) con zona horaria `America/La_Paz`.
+ *   - Diseño responsivo con Tailwind, consistente con los demás componentes clínicos.
+ *   - Diferenciación visual de "Sugerir baja" con colores de estado (`--error` y `--success`).
+ *
+ * Uso:
+ *   <HistorialAtenciones 
+ *      estudianteId="12345"
+ *      token={token}
+ *      onVerDetalle={(id) => setAtencionSeleccionada(id)}
+ *   />
+ */
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -15,7 +56,7 @@ export default function HistorialAtenciones({ estudianteId, token, onVerDetalle 
   const [usuario, setUsuario] = useState<any>(null)
 
   useEffect(() => {
-    // 👤 Recuperar usuario desde localStorage
+    
     const storedUser = localStorage.getItem('usuario')
     if (storedUser) {
       setUsuario(JSON.parse(storedUser))
@@ -56,7 +97,7 @@ export default function HistorialAtenciones({ estudianteId, token, onVerDetalle 
     return <p className="text-center text-[var(--foreground)]/70">No hay atenciones registradas</p>
   }
 
-  // 🔑 Revisar si el usuario tiene rol permitido
+  
   const puedeVerDetalles =
     usuario?.roles?.some((rol: string) => ['admin', 'enfermeria'].includes(rol))
 
@@ -95,7 +136,7 @@ export default function HistorialAtenciones({ estudianteId, token, onVerDetalle 
             )}
           </p>
 
-          {/* 👇 Mostrar botón solo si el usuario es admin o enfermeria */}
+          {/* Mostrar botón solo si el usuario es admin o enfermeria */}
           {puedeVerDetalles && (
             <button
               onClick={() => onVerDetalle(atencion._id)}

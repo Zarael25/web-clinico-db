@@ -1,3 +1,51 @@
+/**
+ * Descripción:
+ *   Modal para asignar o quitar tutores asociados a un estudiante. 
+ *   Muestra un listado de tutores (de la colección `Tutor`) con checkboxes para
+ *   seleccionar cuáles estarán vinculados al estudiante.
+ *
+ * Props:
+ *   - isOpen (boolean): Controla si el modal está visible.
+ *   - onClose (function): Callback para cerrar el modal.
+ *   - estudianteId (string): ID del estudiante al que se asignan tutores.
+ *   - token (string): Token JWT para autenticar las peticiones al backend.
+ *   - onUpdated (function): Callback que se ejecuta al guardar cambios (para refrescar datos en el padre).
+ *
+ * Características:
+ *   - Al abrirse (`isOpen === true`), obtiene todos los tutores con sus estudiantes mediante
+ *     `getTutoresConEstudiantes(token)`.
+ *   - Marca como seleccionados aquellos tutores que ya tienen asignado al estudiante.
+ *   - Permite alternar selección/deselección con checkboxes (`handleToggle`).
+ *   - Al guardar:
+ *       → Itera sobre cada tutor.
+ *       → Si está seleccionado, añade el `estudianteId` a su lista de estudiantes.
+ *       → Si no, lo elimina de su lista.
+ *       → Llama al servicio `updateTutor` para actualizar en el backend.
+ *   - Cierra el modal y ejecuta `onUpdated` para notificar al padre.
+ *
+ * Flujo:
+ *   1. Usuario abre modal desde `DatosPersonales`.
+ *   2. Se listan todos los tutores, con los ya asignados marcados.
+ *   3. Usuario marca o desmarca tutores.
+ *   4. Al guardar → se actualiza en backend y UI.
+ *   5. Modal se cierra automáticamente.
+ *
+ * Relación con otros modales:
+ *   - `EditarCondicionBaseModal`: Edita condición base.
+ *   - `EditarAlergiasModal`: Edita lista de alergias.
+ *   - `EditarVacunasModal`: Edita lista de vacunas.
+ *   → Este es el único modal de edición que maneja **relaciones entre entidades** (Estudiante ↔ Tutor).
+ *
+ * Uso:
+ *   <EditarTutoresModal
+ *      isOpen={isTutoresModalOpen}
+ *      onClose={() => setIsTutoresModalOpen(false)}
+ *      estudianteId={est._id}
+ *      token={token}
+ *      onUpdated={fetchTutoresExtra}
+ *   />
+ */
+
 'use client'
 import { useEffect, useState } from 'react'
 import { getTutoresConEstudiantes, updateTutor } from '@/services/tutores'
@@ -15,13 +63,13 @@ export default function EditarTutoresModal({ isOpen, onClose, estudianteId, toke
   const [selected, setSelected] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
 
-  // 🔹 Cargar tutores y marcar los que ya tienen al estudiante
+  
   useEffect(() => {
     if (isOpen) {
       getTutoresConEstudiantes(token).then((data) => {
         setTutores(data.tutores)
 
-        // marcar automáticamente los tutores que ya tienen al estudiante
+        
         const asignados = data.tutores
           .filter((t: any) => t.estudiantes.some((e: any) => e._id === estudianteId))
           .map((t: any) => t._id)
@@ -45,12 +93,12 @@ export default function EditarTutoresModal({ isOpen, onClose, estudianteId, toke
         let nuevosEstudiantesIds = tutor.estudiantes.map((e: any) => e._id)
 
         if (selected.includes(tutor._id)) {
-          // 👉 aseguramos que el estudiante esté en la lista
+          
           if (!nuevosEstudiantesIds.includes(estudianteId)) {
             nuevosEstudiantesIds.push(estudianteId)
           }
         } else {
-          // 👉 lo quitamos si estaba
+          
           nuevosEstudiantesIds = nuevosEstudiantesIds.filter((id: string) => id !== estudianteId)
         }
 

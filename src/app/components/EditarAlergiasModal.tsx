@@ -1,3 +1,50 @@
+/**
+ * Descripción:
+ *   Modal para editar la lista de alergias de un estudiante dentro del sistema clínico.
+ *   Permite cargar las alergias actuales desde el backend, modificarlas, añadir nuevas
+ *   y guardarlas de vuelta en la base de datos.
+ *
+ * Props:
+ *   - isOpen (boolean): Controla si el modal está visible o no.
+ *   - onClose (function): Callback para cerrar el modal sin guardar cambios.
+ *   - estudianteId (string): ID único del estudiante cuyas alergias se desean editar.
+ *   - token (string): Token JWT válido para autenticar las solicitudes al backend.
+ *   - onUpdated (function): Callback que recibe la nueva lista de alergias actualizada
+ *     después de guardarse en el backend.
+ *
+ * Características:
+ *   - Al abrirse (`isOpen === true`), hace una petición al backend con 
+ *     `getAlergiasByEstudiante(estudianteId, token)` para obtener los datos actuales.
+ *   - Muestra un conjunto de inputs, uno por cada alergia. Si no hay alergias, muestra
+ *     un input vacío inicial.
+ *   - Permite añadir más campos dinámicamente con el botón ➕ "Añadir otra alergia".
+ *   - Guarda los cambios con `updateAlergias(estudianteId, alergias, token)` y
+ *     dispara `onUpdated` con el resultado.
+ *   - Maneja estados de **loading** y **error** para mejorar la experiencia de usuario.
+ *
+ * Flujo:
+ *   1. Usuario abre modal → se cargan las alergias actuales desde backend.
+ *   2. Usuario edita/agrega alergias en inputs dinámicos.
+ *   3. Usuario guarda → backend actualiza, frontend actualiza estado con `onUpdated`.
+ *   4. Modal se cierra.
+ *
+ * Relación con otros componentes:
+ *   - `DatosPersonales`: desde ahí se abre este modal cuando un admin/enfermería
+ *     quiere editar las alergias del estudiante.
+ *   - `EditarVacunasModal` y `EditarCondicionBaseModal`: comparten la misma lógica,
+ *     pero para diferentes atributos de condición clínica.
+ *
+ * Uso:
+ *   <EditarAlergiasModal
+ *      isOpen={isModalAbierto}
+ *      onClose={() => setIsModalAbierto(false)}
+ *      estudianteId={est._id}
+ *      token={token}
+ *      onUpdated={(nuevasAlergias) => setAlergias(nuevasAlergias)}
+ *   />
+ */
+
+
 'use client'
 import { useState, useEffect } from 'react'
 import { getAlergiasByEstudiante, updateAlergias } from '@/services/condicionBase'
@@ -21,7 +68,7 @@ export default function EditarAlergiasModal({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Cargar alergias actuales cuando se abre el modal
+  
   useEffect(() => {
     if (isOpen) {
       getAlergiasByEstudiante(estudianteId, token)
@@ -29,7 +76,7 @@ export default function EditarAlergiasModal({
           if (data.length > 0) {
             setAlergias(data)
           } else {
-            setAlergias([{ alergia: '' }]) // 👈 un input vacío si no hay alergias
+            setAlergias([{ alergia: '' }]) 
           }
         })
         .catch((err) => {
@@ -53,7 +100,7 @@ export default function EditarAlergiasModal({
     setLoading(true)
     setError(null)
     try {
-      const data = await updateAlergias(estudianteId, alergias, token) // PUT con toda la lista
+      const data = await updateAlergias(estudianteId, alergias, token) 
       onUpdated(data.alergias)
       onClose()
     } catch (err: any) {

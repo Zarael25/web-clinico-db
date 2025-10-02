@@ -1,3 +1,36 @@
+/**
+ * Descripción:
+ *   Componente de solo visualización que muestra el detalle clínico base de un estudiante:
+ *   condición, alergias y vacunas. Se utiliza en la sección de datos personales o
+ *   al momento de registrar una nueva atención médica.
+ *
+ * Props:
+ *   - condicion (string): Texto de la condición clínica base. Si no se envía, muestra "No registrada".
+ *   - alergias (array): Puede ser un array de strings o de objetos con `{ alergia: string }`.
+ *     Si está vacío, se muestra "No registradas".
+ *   - vacunas (array): Puede ser un array de strings o de objetos con `{ vacuna: string }`.
+ *     Si está vacío, se muestra "No registradas".
+ *
+ * Características:
+ *   - Renderiza bloques con estilos consistentes (borde, sombra, badge).
+ *   - Acepta flexiblemente datos en forma de string o de objeto.
+ *   - No permite edición, solo visualización.
+ *   - Útil como parte de otros formularios o vistas de detalle.
+ *
+ * Uso:
+ *   <CondicionBaseDetalle
+ *      condicion="Asma crónica"
+ *      alergias={[{ alergia: "Polen" }, "Penicilina"]}
+ *      vacunas={[{ vacuna: "Hepatitis B" }, "COVID-19"]}
+ *   />
+ *
+ * Componente relacionado:
+ *   - AgregarAtencion → usa este componente para mostrar el estado base del estudiante
+ *     antes de registrar una nueva atención.
+ */
+
+
+
 'use client'
 
 type CondicionBaseDetalleProps = {

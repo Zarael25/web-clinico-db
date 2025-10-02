@@ -1,3 +1,43 @@
+/**
+ * Descripción:
+ *   Componente principal para mostrar y editar los datos personales clínicos
+ *   de un estudiante. Permite visualizar tutores, condición base, alergias
+ *   y vacunas, con soporte de edición si el usuario tiene los roles adecuados.
+ *
+ * Props:
+ *   - estudiante (objeto): Datos completos del estudiante (nombre, apellidos, tutores, gestiones, etc.)
+ *   - condicionBase (objeto opcional): Contiene los datos iniciales de condición base, alergias y vacunas.
+ *   - token (string): Token JWT para autorizar llamadas al backend.
+ *
+ * Características:
+ *   - Muestra tarjetas con información de tutores (embebidos en Estudiante o asociados desde colección `Tutor`).
+ *   - Renderiza la condición base, lista de alergias y vacunas.
+ *   - Usa modales dedicados para editar cada sección:
+ *       • EditarCondicionBaseModal → condición base
+ *       • EditarAlergiasModal → lista de alergias
+ *       • EditarVacunasModal → lista de vacunas
+ *       • EditarTutoresModal → asignar tutores adicionales
+ *   - Aplica reglas de roles:
+ *       • Solo usuarios con roles `admin` o `enfermeria` pueden editar.
+ *   - Sin edición, funciona como un detalle visual de solo lectura.
+ *
+ * Uso:
+ *   <DatosPersonales
+ *      estudiante={estudiante}
+ *      condicionBase={condicionBase}
+ *      token={token}
+ *   />
+ *
+ * Flujo:
+ *   1. Render inicial → muestra los datos y botones "Editar" si el usuario puede.
+ *   2. Al abrir un modal → se carga formulario con valores actuales.
+ *   3. Al guardar cambios → se actualiza backend y se refresca el estado local.
+ *
+ * Relación con otros componentes:
+ *   - ClinicoHistorialPage: Inserta este componente en la sección "Datos".
+ *   - Editar*Modal: cada modal gestiona edición granular de un dato específico.
+ */
+
 'use client'
 import { useState, useEffect } from 'react'
 import EditarCondicionBaseModal from '@/app/components/EditarCondicionBaseModal'
@@ -25,7 +65,7 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
   const [tutoresExtra, setTutoresExtra] = useState<any[]>([])
   const [rolesUsuario, setRolesUsuario] = useState<string[]>([])
 
-  // 🔎 Leer roles del usuario desde localStorage
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const usuarioStr = localStorage.getItem('usuario')
@@ -46,10 +86,10 @@ export default function DatosPersonales({ estudiante, condicionBase, token }: Da
     if (condicionBase?.vacunas) setVacunas(condicionBase.vacunas)
   }, [condicionBase])
 
-  // ✅ Solo admin o enfermería pueden editar
+  
   const puedeEditar = rolesUsuario.includes('admin') || rolesUsuario.includes('enfermeria')
 
-  // 📌 Cargar tutores desde colección Tutor.ts (los que tienen al estudiante asignado)
+  
   const fetchTutoresExtra = async () => {
     try {
       const data = await getTutoresConEstudiantes(token)

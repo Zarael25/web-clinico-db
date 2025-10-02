@@ -1,3 +1,47 @@
+/**
+ * Descripción:
+ *   Archivo de configuración global de estilos usando Tailwind CSS
+ *   con soporte para **tema claro/oscuro** mediante variables CSS.
+ *   Define la paleta de colores, tipografías y estilos básicos de la aplicación.
+ *
+ * Secciones:
+ *   1. Importación de Tailwind.
+ *   2. Definición de variables para el tema claro en `:root`.
+ *   3. Definición de variables para el tema oscuro en `.dark`.
+ *   4. Clases personalizadas de fuentes (`.font-titulo`, `.font-subtitulo`, `.font-parrafo`).
+ *   5. Estilos globales de `html` y `body`.
+ *
+ * Variables definidas:
+ *   - --background   → Fondo principal
+ *   - --foreground   → Color de texto principal
+ *   - --primary      → Color primario de la marca (#517EF5, azul)
+ *   - --secondary    → Color secundario de la marca (#F5D951, amarillo)
+ *   - --accent       → Color de acento (ej: enlaces, detalles)
+ *   - --border       → Color de bordes
+ *   - --success      → Estados de éxito
+ *   - --error        → Estados de error
+ *   - --warning      → Estados de advertencia
+ *   - --info         → Estados de información
+ *
+ * Tipografías:
+ *   - --font-titulo    → Fuente usada para títulos (Vollkorn).
+ *   - --font-subtitulo → Fuente usada para subtítulos (Flamenco).
+ *   - --font-parrafo   → Fuente usada para párrafos (Padauk).
+ *
+ * Flujo:
+ *   - Por defecto se aplican las variables del **tema claro**.
+ *   - Al añadir la clase `.dark` al elemento `<html>`, se aplican los valores de tema oscuro.
+ *   - Esto es controlado dinámicamente en la app con el componente `ThemeToggle`.
+ *
+ * Características:
+ *   - Totalmente integrable con `dark:` de Tailwind.
+ *   - Fácil personalización de colores cambiando solo variables.
+ *   - Garantiza consistencia de diseño en todos los componentes.
+ */
+
+
+
+
 @import "tailwindcss";
 
 /* ===== Tema Claro ===== */

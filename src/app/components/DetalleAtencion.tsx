@@ -1,3 +1,42 @@
+/**
+ * Descripción:
+ *   Componente para mostrar el detalle completo de una atención médica
+ *   de un estudiante. Consulta los datos desde el backend a partir del
+ *   `atencionId` y renderiza toda la información de manera detallada.
+ *
+ * Props:
+ *   - atencionId (string): ID único de la atención a consultar en el backend.
+ *   - token (string): Token JWT válido para autenticar la solicitud.
+ *   - onVolver (function): Callback a ejecutar al presionar el botón de regresar.
+ *
+ * Características:
+ *   - Hace una llamada a `getAtencionDetalle(atencionId, token)` en el montaje
+ *     para obtener la información desde el backend.
+ *   - Renderiza:
+ *       • Fecha formateada (en zona horaria "America/La_Paz").
+ *       • Usuario que atendió (médico o personal de enfermería).
+ *       • Motivo de consulta, diagnóstico, tratamiento.
+ *       • Estado de "sugerir baja" con colores (rojo/verde).
+ *       • Lista de medicamentos administrados (nombre, presentación, dosis, vía).
+ *   - Incluye un botón "← Volver al historial" que dispara `onVolver()`.
+ *
+ * Flujo:
+ *   1. Mientras carga → muestra "Cargando detalle...".
+ *   2. Si falla la carga → muestra mensaje de error.
+ *   3. Si carga correctamente → renderiza toda la información en secciones.
+ *
+ * Relación con otros componentes:
+ *   - ClinicoHistorialPage: Muestra este detalle al seleccionar una atención.
+ *   - AgregarAtencion: Puede redirigir a este componente después de crear una nueva atención.
+ *
+ * Uso:
+ *   <DetalleAtencion
+ *      atencionId={id}
+ *      token={token}
+ *      onVolver={() => setVista('historial')}
+ *   />
+ */
+
 'use client'
 
 import { useEffect, useState } from 'react'

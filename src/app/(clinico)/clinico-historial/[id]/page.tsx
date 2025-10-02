@@ -1,3 +1,38 @@
+/**
+ * Descripción:
+ *   Página de historial clínico de un estudiante en el sistema "Don Bosco Clínico".
+ *   Permite consultar datos personales, condición base, historial de atenciones
+ *   y registrar nuevas atenciones médicas según los permisos del usuario.
+ *
+ * Características:
+ *   - Obtiene información completa del estudiante por ID (parámetro de URL).
+ *   - Muestra datos personales y condición base (condición, alergias, vacunas).
+ *   - Secciones dinámicas:
+ *       • Datos → Información general del estudiante.
+ *       • Nueva Atención → Formulario de atención médica (solo admin/enfermería).
+ *       • Historial → Lista de atenciones previas con acceso al detalle.
+ *       • Agregar Atención → Registro de atención asociada a la condición base.
+ *   - Aside lateral con lista rápida de atenciones anteriores.
+ *   - Modal dinámico para detalle de atenciones seleccionadas.
+ *
+ * Roles y permisos:
+ *   - Crear/Agregar atenciones → ['admin', 'enfermeria']
+ *   - Consultar historial → cualquier usuario autenticado con acceso a niveles.
+ *
+ * Uso:
+ *   - Navegar entre secciones desde el panel lateral (Datos, Nueva Atención, Historial).
+ *   - Seleccionar una atención del historial para ver su detalle.
+ *   - Si el usuario tiene permisos, puede registrar nuevas atenciones.
+ *
+ * Componentes relacionados:
+ *   - Header: Encabezado principal con logout.
+ *   - NavTabs: Navegación global del sistema.
+ *   - DatosPersonales: Muestra datos básicos y condición base.
+ *   - NuevaAtencion: Formulario previo a registrar atención.
+ *   - AgregarAtencion: Formulario completo para registrar atención médica.
+ *   - HistorialAtenciones: Lista de atenciones registradas.
+ *   - DetalleAtencion: Muestra detalle completo de una atención seleccionada.
+ */
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -45,19 +80,19 @@ export default function ClinicoHistorialPage() {
 
   useEffect(() => {
     if (estudianteId && token) {
-      // 🔹 Siempre refrescamos el estudiante
+      
       getEstudianteById(estudianteId, token)
         .then((data) => setEstudiante(data))
         .catch((err) => console.error('Error cargando estudiante:', err))
 
-      // 🔹 Si estamos en "datos" o "nueva" refrescamos condicion base
+      
       if (seccionActiva === 'datos' || seccionActiva === 'nueva') {
         getCondicionBaseByEstudiante(estudianteId, token)
           .then((data) => setCondicionBase(data))
           .catch((err) => console.error('Error cargando condición base:', err))
       }
 
-      // 🔹 Si estamos en "historial" refrescamos atenciones
+      
       if (seccionActiva === 'historial') {
         getAtencionesByEstudiante(estudianteId, token)
           .then((data) => {
@@ -83,7 +118,7 @@ export default function ClinicoHistorialPage() {
     })
   }
 
-  // 👇 Solo admin o enfermeria pueden ver el botón
+  
   const puedeCrearAtencion = rolesUsuario.includes('admin') || rolesUsuario.includes('enfermeria')
 
   return (

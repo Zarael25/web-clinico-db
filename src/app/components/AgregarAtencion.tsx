@@ -1,3 +1,45 @@
+/**
+ * Descripción:
+ *   Componente para registrar una nueva atención médica de un estudiante.
+ *   Permite ingresar motivo, diagnóstico, tratamiento, sugerir baja
+ *   y asociar medicamentos con dosis y vía de administración.
+ *
+ * Props:
+ *   - condicion (string): Condición clínica base del estudiante.
+ *   - alergias (array): Lista de alergias registradas del estudiante.
+ *   - vacunas (array): Lista de vacunas registradas del estudiante.
+ *   - estudianteId (string): ID del estudiante al que se le registra la atención.
+ *   - token (string): JWT para autenticar las peticiones al backend.
+ *   - onAtencionCreada (function): Callback opcional que se ejecuta cuando
+ *     la atención se crea exitosamente, devolviendo el ID de la nueva atención.
+ *
+ * Características:
+ *   - Formulario controlado con estados locales (`useState`).
+ *   - Carga de medicamentos disponibles desde backend (`getMedicamentos`).
+ *   - Selección dinámica de medicamentos, con dosis y vía personalizable.
+ *   - Botón para quitar medicamentos añadidos.
+ *   - Manejo de estados de carga (`loading`) con botón deshabilitado.
+ *   - Redirección automática a la vista de detalle de la atención creada
+ *     si no se provee `onAtencionCreada`.
+ *
+ * Uso:
+ *   <AgregarAtencion
+ *      condicion="Asma"
+ *      alergias={[{ alergia: "Polen" }]}
+ *      vacunas={[{ vacuna: "Hepatitis B" }]}
+ *      estudianteId="65f1..."
+ *      token={jwt}
+ *      onAtencionCreada={(id) => console.log("Nueva atención:", id)}
+ *   />
+ *
+ * Componentes relacionados:
+ *   - CondicionBaseDetalle → muestra resumen de condición, alergias y vacunas.
+ *   - Servicios:
+ *       • crearAtencion → registra atención en backend.
+ *       • getMedicamentos → obtiene lista de medicamentos disponibles.
+ */
+
+
 'use client'
 
 import CondicionBaseDetalle from './CondicionBaseDetalle'
@@ -82,7 +124,7 @@ export default function AgregarAtencion({
       console.error('❌ Error al registrar la atención:', error)
       alert('Error al registrar la atención')
     } finally {
-      setLoading(false) // 👈 desactivar
+      setLoading(false) 
     }
   }
 

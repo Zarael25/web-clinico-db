@@ -1,3 +1,44 @@
+/**
+ * Descripción:
+ *   Modal para editar la lista de vacunas de un estudiante. 
+ *   Permite agregar, modificar o eliminar vacunas asociadas en la colección `CondicionBase`.
+ *
+ * Props:
+ *   - isOpen (boolean): Controla si el modal está visible.
+ *   - onClose (function): Callback para cerrar el modal.
+ *   - estudianteId (string): ID del estudiante al que pertenecen las vacunas.
+ *   - token (string): Token JWT de autenticación.
+ *   - onUpdated (function): Callback que devuelve las vacunas actualizadas al componente padre.
+ *
+ * Flujo:
+ *   1. Al abrirse (`isOpen === true`), obtiene la lista de vacunas existentes
+ *      con `getVacunasByEstudiante(estudianteId, token)`.
+ *   2. Si existen vacunas → las muestra en inputs editables.
+ *      Si no existen → inicializa con un input vacío.
+ *   3. El usuario puede:
+ *       - Modificar vacunas existentes.
+ *       - Agregar más con el botón "➕ Añadir otra vacuna".
+ *   4. Al guardar → se envían los cambios al backend con `updateVacunas`.
+ *   5. Se ejecuta `onUpdated(data.vacunas)` para actualizar el estado en el padre.
+ *   6. El modal se cierra automáticamente.
+ *
+ * Características:
+ *   - Maneja loading y errores de forma controlada.
+ *   - Permite scroll si hay muchas vacunas (`max-h-[300px] overflow-y-auto`).
+ *   - Mantiene consistencia de estilos con los otros modales (condición base, alergias, tutores).
+ *
+ * Uso:
+ *   <EditarVacunasModal
+ *      isOpen={isVacunasModalOpen}
+ *      onClose={() => setIsVacunasModalOpen(false)}
+ *      estudianteId={est._id}
+ *      token={token}
+ *      onUpdated={(nuevasVacunas) => setVacunas(nuevasVacunas)}
+ *   />
+ */
+
+
+
 'use client'
 import { useState, useEffect } from 'react'
 import { getVacunasByEstudiante, updateVacunas } from '@/services/condicionBase'
@@ -21,7 +62,7 @@ export default function EditarVacunasModal({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Cargar vacunas actuales cuando se abre el modal
+  
   useEffect(() => {
     if (isOpen) {
       getVacunasByEstudiante(estudianteId, token)
@@ -29,7 +70,7 @@ export default function EditarVacunasModal({
           if (data.length > 0) {
             setVacunas(data)
           } else {
-            setVacunas([{ vacuna: '' }]) // 👈 un input vacío si no hay vacunas
+            setVacunas([{ vacuna: '' }]) 
           }
         })
         .catch((err) => {
@@ -53,7 +94,7 @@ export default function EditarVacunasModal({
     setLoading(true)
     setError(null)
     try {
-      const data = await updateVacunas(estudianteId, vacunas, token) // PUT con toda la lista
+      const data = await updateVacunas(estudianteId, vacunas, token)
       onUpdated(data.vacunas)
       onClose()
     } catch (err: any) {

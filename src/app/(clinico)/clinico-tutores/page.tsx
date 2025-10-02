@@ -1,3 +1,51 @@
+/**
+ * Descripción:
+ *   Página de gestión de tutores en el sistema "Don Bosco Clínico".
+ *   Permite listar tutores registrados junto con los estudiantes asociados,
+ *   además de añadir y editar tutores mediante modales con formularios.
+ *
+ * Características:
+ *   - Listado de tutores con datos principales:
+ *       • Nombre y apellido
+ *       • Carnet de identidad
+ *       • Parentesco
+ *       • Celular
+ *       • Lugar de trabajo
+ *       • Estudiantes vinculados (con RUDE y carnet)
+ *   - Modal para crear tutor:
+ *       • Formulario con validación de campos obligatorios.
+ *       • Registra tutor sin estudiantes inicialmente.
+ *   - Modal para editar tutor:
+ *       • Permite actualizar todos los campos.
+ *       • Actualiza también la lista de estudiantes asociados.
+ *   - Manejo de estados locales:
+ *       • loading → indica cuando se cargan los tutores.
+ *       • error → muestra mensaje de error si falla la carga.
+ *       • saving → evita acciones duplicadas en formularios.
+ *   - Feedback visual:
+ *       • Hover en filas de tabla.
+ *       • Botones con colores distintivos para acciones.
+ *
+ * Roles y permisos:
+ *   - Acceso restringido a usuarios autenticados mediante token JWT.
+ *   - Backend controla roles permitidos (ej. admin, enfermería).
+ *
+ * Uso:
+ *   - Al cargar la página se obtiene la lista de tutores con sus estudiantes.
+ *   - Botón "+ Añadir" abre el modal de creación.
+ *   - Botón "Editar" abre modal de edición con los datos precargados.
+ *   - Tras guardar, la tabla se actualiza automáticamente.
+ *
+ * Componentes relacionados:
+ *   - Header: Encabezado global de la aplicación.
+ *   - NavTabs: Navegación superior entre secciones.
+ *   - Servicios:
+ *       • getTutoresConEstudiantes(token) → lista tutores con sus estudiantes.
+ *       • createTutor(data, token) → crea un nuevo tutor.
+ *       • updateTutor(id, data, token) → edita un tutor existente.
+ */
+
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -31,7 +79,7 @@ export default function TutoresPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Modal de crear
+  
   const [showModal, setShowModal] = useState(false)
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
@@ -41,11 +89,11 @@ export default function TutoresPage() {
   const [celular, setCelular] = useState('')
   const [saving, setSaving] = useState(false)
 
-  // Modal de editar
+  
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedTutor, setSelectedTutor] = useState<Tutor | null>(null)
 
-  // 🔑 token
+  
   const token =
     typeof document !== 'undefined'
       ? document.cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1] || ''
@@ -68,7 +116,7 @@ export default function TutoresPage() {
     if (token) fetchData()
   }, [token])
 
-  // ✅ crear tutor
+  
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
@@ -85,7 +133,7 @@ export default function TutoresPage() {
         },
         token
       )
-      // limpiar
+      
       setNombre('')
       setApellido('')
       setCarnet('')
@@ -101,7 +149,7 @@ export default function TutoresPage() {
     }
   }
 
-  // ✅ editar tutor
+  
   const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedTutor) return
@@ -211,7 +259,7 @@ export default function TutoresPage() {
         )}
       </main>
 
-      {/* 🔹 Modal para añadir tutor */}
+      {/* Modal para añadir tutor */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <div className="bg-[var(--background)] text-[var(--foreground)] p-6 rounded-xl shadow-lg w-full max-w-md">
@@ -297,7 +345,7 @@ export default function TutoresPage() {
         </div>
       )}
 
-      {/* 🔹 Modal para editar tutor */}
+      {/* Modal para editar tutor */}
       {showEditModal && selectedTutor && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
           <div className="bg-[var(--background)] text-[var(--foreground)] p-6 rounded-xl shadow-lg w-full max-w-md">
