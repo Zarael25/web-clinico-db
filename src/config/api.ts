@@ -61,7 +61,8 @@
 
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-clinico-db.vercel.app";
+  //process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-clinico-db.vercel.app";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.1.101:3000";
 
 export const ENDPOINTS = {
   AUTH: {
