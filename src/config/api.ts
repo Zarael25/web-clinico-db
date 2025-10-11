@@ -56,10 +56,6 @@
  *
  */
 
-
-
-
-
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-clinico-db.onrender.com";
 
@@ -77,6 +73,7 @@ export const ENDPOINTS = {
     LIST: `${API_BASE_URL}/v1/estudiantes/`,     
     DETALLE: (id: string) => `${API_BASE_URL}/v1/estudiantes/${id}/`, 
     BUSCAR: `${API_BASE_URL}/v1/estudiantes/buscar/`, 
+    BUSCAR_PAGINADO: `${API_BASE_URL}/v1/estudiantes/buscar/paginado`,
   },
 
   CONDICION_BASE: {

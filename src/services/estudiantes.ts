@@ -68,3 +68,26 @@ export async function getEstudianteById(id: string, token: string) {
 
   return response.json()
 }
+
+
+export async function buscarEstudiantesPaginado(
+  query: string = '',
+  pagina: number = 1,
+  limite: number = 12,
+  token: string
+) {
+  const url = `${ENDPOINTS.ESTUDIANTES.BUSCAR_PAGINADO}?q=${encodeURIComponent(query)}&pagina=${pagina}&limite=${limite}`
+
+  const response = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al buscar estudiantes paginados: ${response.statusText}`)
+  }
+
+  return response.json()
+}
