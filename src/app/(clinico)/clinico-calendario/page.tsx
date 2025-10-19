@@ -168,17 +168,21 @@ export default function ClinicoCalendarioPage() {
   }
 
   
+  const [descargando, setDescargando] = useState(false)
+
   const handleDescargarReporte = async () => {
     try {
+      setDescargando(true) // activar indicador
+
       let anio = String(anioCal)
       let mes: string | undefined
       let dia: string | undefined
 
       if (modoReporte === 'mes' || modoReporte === 'dia') {
-        mes = String(mesCal + 1) 
+        mes = String(mesCal + 1)
       }
       if (modoReporte === 'dia') {
-        dia = fechaSeleccionada.split('-')[2] 
+        dia = fechaSeleccionada.split('-')[2]
       }
 
       const blob = await descargarReporteAtenciones(token, anio, mes, dia)
@@ -190,8 +194,12 @@ export default function ClinicoCalendarioPage() {
       window.URL.revokeObjectURL(url)
     } catch (err) {
       console.error('❌ Error al descargar el reporte:', err)
+    } finally {
+      setDescargando(false) // desactivar indicador
     }
   }
+
+
 
   const meses = [
     'Enero','Febrero','Marzo','Abril','Mayo','Junio',
@@ -225,9 +233,34 @@ export default function ClinicoCalendarioPage() {
             {/* Botón de descarga */}
             <button
               onClick={handleDescargarReporte}
-              className="bg-[var(--primary)] text-white px-3 py-1.5 rounded text-sm hover:bg-[var(--secondary)] transition"
+              disabled={descargando}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm font-semibold transition
+                ${descargando
+                  ? 'bg-[var(--primary)]/70 cursor-not-allowed text-white'
+                  : 'bg-[var(--primary)] hover:bg-[var(--secondary)] text-white'
+                }`}
             >
-              Descargar
+              {descargando ? (
+                <span className="animate-pulse">Generando...</span>
+              ) : (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 16v-8m0 0l-4 4m4-4l4 4m-9 8h10a2 2 0 002-2V6a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Descargar
+                </>
+              )}
             </button>
           </>
         )}

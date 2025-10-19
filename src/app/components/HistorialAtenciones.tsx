@@ -42,7 +42,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getAtencionesByEstudiante } from '@/services/atenciones'
+import { getAtencionesByEstudiante, descargarReporteEstudiante } from '@/services/atenciones'
 
 type HistorialAtencionesProps = {
   estudianteId: string
@@ -54,9 +54,9 @@ export default function HistorialAtenciones({ estudianteId, token, onVerDetalle 
   const [atenciones, setAtenciones] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [usuario, setUsuario] = useState<any>(null)
+  const [descargando, setDescargando] = useState(false)
 
   useEffect(() => {
-    
     const storedUser = localStorage.getItem('usuario')
     if (storedUser) {
       setUsuario(JSON.parse(storedUser))
@@ -89,6 +89,25 @@ export default function HistorialAtenciones({ estudianteId, token, onVerDetalle 
     })
   }
 
+  const handleDescargarPDF = async () => {
+    try {
+      setDescargando(true)
+      const blob = await descargarReporteEstudiante(estudianteId, token)
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `reporte_estudiante_${estudianteId}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+    } catch (err) {
+      console.error('❌ Error al descargar el PDF:', err)
+      alert('No se pudo generar el reporte PDF.')
+    } finally {
+      setDescargando(false)
+    }
+  }
+
   if (loading) {
     return <p className="text-center text-[var(--foreground)]/70">Cargando historial...</p>
   }
@@ -97,14 +116,32 @@ export default function HistorialAtenciones({ estudianteId, token, onVerDetalle 
     return <p className="text-center text-[var(--foreground)]/70">No hay atenciones registradas</p>
   }
 
-  
-  const puedeVerDetalles =
-    usuario?.roles?.some((rol: string) => ['admin', 'enfermeria'].includes(rol))
+  const puedeVerDetalles = usuario?.roles?.some((rol: string) => ['admin', 'enfermeria'].includes(rol))
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-titulo text-[var(--primary)] mb-4">Historial Clínico</h2>
+      {/* Encabezado con botón */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-titulo text-[var(--primary)]">Historial Clínico</h2>
+        <button
+          onClick={handleDescargarPDF}
+          disabled={descargando}
+          className="flex items-center gap-2 bg-[var(--primary)] text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-[var(--secondary)] transition-colors disabled:opacity-70"
+        >
+          {descargando ? (
+            <span className="animate-pulse">Generando...</span>
+          ) : (
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 16v-8m0 0l-4 4m4-4l4 4m-9 8h10a2 2 0 002-2V6a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Descargar PDF
+            </>
+          )}
+        </button>
+      </div>
 
+      {/* Listado de atenciones */}
       {atenciones.map((atencion) => (
         <div
           key={atencion._id}

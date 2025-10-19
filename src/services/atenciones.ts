@@ -157,3 +157,22 @@ export async function descargarReporteAtenciones(
   const blob = await response.blob()
   return blob
 }
+
+
+export async function descargarReporteEstudiante(estudianteId: string, token: string) {
+  const url = ENDPOINTS.ATENCIONES.REPORTE_ESTUDIANTE(estudianteId)
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Error al generar el reporte PDF del estudiante')
+  }
+
+  // Recibir el PDF como blob para poder descargarlo
+  const blob = await response.blob()
+  return blob
+}

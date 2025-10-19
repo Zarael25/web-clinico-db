@@ -115,6 +115,10 @@ export const ENDPOINTS = {
       return url.slice(0, -1) 
     },
 
+
+    REPORTE_ESTUDIANTE: (id: string) =>
+      `${API_BASE_URL}/v1/atenciones/reporte/estudiante/${id}`,
+
   },
 
 
