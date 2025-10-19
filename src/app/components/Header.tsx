@@ -64,7 +64,7 @@ export default function Header() {
   const handleLogout = () => {
     
     document.cookie = 'token=; path=/; max-age=0'
-
+    sessionStorage.removeItem('dashboardMostrado')
     
     router.push('/auth/login')
   }

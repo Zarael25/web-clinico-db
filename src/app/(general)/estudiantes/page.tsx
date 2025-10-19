@@ -45,6 +45,7 @@ import Header from '../../components/Header'
 import NavTabs from '../../components/NavTabs'
 import { useRouter } from 'next/navigation'
 import { buscarEstudiantesPaginado } from '@/services/estudiantes'
+import DashboardResumenModal from '@/app/components/DashboardResumenModal' // 👈 import del modal
 
 export default function EstudiantesPage() {
   const [busqueda, setBusqueda] = useState('')
@@ -91,29 +92,18 @@ export default function EstudiantesPage() {
     }
   }
 
-  // 🧩 Generar la lista resumida de páginas para mostrar
   const getPaginasVisibles = () => {
     const paginas: (number | string)[] = []
 
     if (totalPaginas <= 6) {
-      // Si hay pocas páginas, las mostramos todas
       for (let i = 1; i <= totalPaginas; i++) paginas.push(i)
     } else {
-      // Siempre mostrar la primera página
       paginas.push(1)
-
-      // Mostrar "..." si el rango activo está lejos del inicio
       if (paginaActual > 4) paginas.push('...')
-
-      // Páginas cercanas a la actual (una antes, la actual, una después)
       const start = Math.max(2, paginaActual - 1)
       const end = Math.min(totalPaginas - 1, paginaActual + 1)
       for (let i = start; i <= end; i++) paginas.push(i)
-
-      // Mostrar "..." si el rango activo está lejos del final
       if (paginaActual < totalPaginas - 3) paginas.push('...')
-
-      // Siempre mostrar la última página
       paginas.push(totalPaginas)
     }
 
@@ -122,10 +112,15 @@ export default function EstudiantesPage() {
 
   const paginasVisibles = getPaginasVisibles()
 
+  console.log('✅ El componente de estudiantes se está renderizando correctamente')
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <Header />
       <NavTabs />
+
+      {/* 🧠 Modal de resumen del sistema clínico */}
+      <DashboardResumenModal /> 
+
       <main className="p-6">
         {/* 🔍 Barra de búsqueda */}
         <div className="mb-6 flex items-center gap-4">
@@ -141,11 +136,6 @@ export default function EstudiantesPage() {
                        focus:outline-none focus:ring-2 focus:ring-[var(--primary)] font-parrafo"
           />
         </div>
-
-        {/* 🧾 Información general 
-        <p className="text-sm text-[var(--muted)] mb-4 font-parrafo">
-          Mostrando página {paginaActual} de {totalPaginas} — {totalEstudiantes} estudiantes encontrados
-        </p>*/}
 
         {/* 🧍‍♀️ Fichas de estudiantes */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -174,10 +164,9 @@ export default function EstudiantesPage() {
           ))}
         </div>
 
-        {/* 🔢 Paginación resumida */}
+        {/* 🔢 Paginación */}
         {totalPaginas > 1 && (
           <div className="flex justify-center mt-8 gap-2 flex-wrap items-center">
-            {/* Flecha anterior */}
             <button
               onClick={() => handleChangePage(paginaActual - 1)}
               disabled={paginaActual === 1}
@@ -186,7 +175,6 @@ export default function EstudiantesPage() {
               ⬅
             </button>
 
-            {/* Números de página resumidos */}
             {paginasVisibles.map((num, idx) =>
               num === '...' ? (
                 <span key={`ellipsis-${idx}`} className="px-3 font-bold text-[var(--muted)]">
@@ -208,7 +196,6 @@ export default function EstudiantesPage() {
               )
             )}
 
-            {/* Flecha siguiente */}
             <button
               onClick={() => handleChangePage(paginaActual + 1)}
               disabled={paginaActual === totalPaginas}

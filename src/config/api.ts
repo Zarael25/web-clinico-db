@@ -140,5 +140,10 @@ export const ENDPOINTS = {
   },
 
 
+  DASHBOARD: {
+    RESUMEN: `${API_BASE_URL}/v1/dashboard/resumen/`, // ✅ resumen general del sistema
+  },
+
+
 
 };
