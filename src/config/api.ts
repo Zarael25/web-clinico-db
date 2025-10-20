@@ -142,6 +142,7 @@ export const ENDPOINTS = {
 
   DASHBOARD: {
     RESUMEN: `${API_BASE_URL}/v1/dashboard/resumen/`, // ✅ resumen general del sistema
+    ATENCIONES_NIVEL: `${API_BASE_URL}/v1/dashboard/atenciones-nivel/`, // ✅ estadísticas por nivel (PM, SM, PT, ST)
   },
 
 

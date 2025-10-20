@@ -104,6 +104,14 @@ export default function NavTabs({ children }: NavTabsProps) {
             >
               Tutores
             </Link>
+
+            <Link 
+              href="/clinico-panel" 
+              className={linkClasses('/clinico-panel')}
+            >
+              Panel de Control
+            </Link>
+
           </>
         )}
       </div>
