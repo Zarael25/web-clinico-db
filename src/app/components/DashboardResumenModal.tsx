@@ -7,23 +7,52 @@ export default function DashboardResumenModal() {
   const [mostrar, setMostrar] = useState(false)
 
   useEffect(() => {
-    console.log('🟢 useEffect ejecutado — verificando si ya se mostró el modal')
+    console.log('🟢 useEffect — verificando rol y si ya se mostró el modal')
 
-    // 🔍 Revisar si ya se mostró en esta sesión
+    // 📌 1. Obtener usuario desde localStorage
+    const usuarioJSON = localStorage.getItem('usuario')
+
+    if (!usuarioJSON) {
+      console.log('🚫 No hay usuario en localStorage')
+      return
+    }
+
+    const usuario = JSON.parse(usuarioJSON)
+
+    // 📌 2. Obtener roles del usuario (puede ser string o array)
+    let rolesUsuario: string[] = []
+
+    if (Array.isArray(usuario.roles)) {
+      rolesUsuario = usuario.roles
+    } else if (usuario.rol) {
+      rolesUsuario = [usuario.rol]
+    }
+
+    console.log('🧩 Roles del usuario:', rolesUsuario)
+
+    const rolesPermitidos = ['admin', 'administracion', 'enfermeria']
+
+    // 📌 3. Verificar si el usuario tiene un rol permitido
+    const autorizado = rolesUsuario.some((rol) => rolesPermitidos.includes(rol))
+
+    if (!autorizado) {
+      console.log('🚫 Usuario sin permisos → No mostrar modal')
+      return
+    }
+
+    // 📌 4. Verificar si ya se mostró el modal en esta sesión
     const mostrado = sessionStorage.getItem('dashboardMostrado')
 
     if (!mostrado) {
       console.log('✅ Mostrando modal por primera vez')
       setMostrar(true)
-      sessionStorage.setItem('dashboardMostrado', 'true') // marcar como mostrado
+      sessionStorage.setItem('dashboardMostrado', 'true')
     } else {
-      console.log('🚫 Modal ya mostrado en esta sesión')
+      console.log('🚫 Modal ya fue mostrado antes en esta sesión')
     }
   }, [])
 
   if (!mostrar) return null
-
-  console.log('🎯 Modal visible en el DOM')
 
   return (
     <div className="fixed inset-0 bg-black/70 text-white flex justify-center items-center z-[99999] animate-fadeIn">
